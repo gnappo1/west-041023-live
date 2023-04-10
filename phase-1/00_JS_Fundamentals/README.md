@@ -3,7 +3,7 @@
 ## SWBAT
 - Use comments appropriately
 - Use console.log, debugger, and node to test and debug JavaScript
-- Define all 7 JavaScript data types
+- Define all JavaScript data types
 - Implement JavaScript conditionals
 - Implement `for` and `while` loops
 - Perform CRUD operations on Arrays
@@ -156,7 +156,7 @@ if(weather == 'sunny'){
 
 ```
 
-## Arrays
+## Arrays (Object Data Type)
 Arrays are list-like objects with indexes and elements. 
 Each element has a specific index starting from 0. 
 ```js
@@ -202,7 +202,7 @@ for(element of arr){
 }
 ```
 
-## Object
+## Object (Object Data Type)
 Object is a data type that's used to store other data. Arrays are a type of object. A typical Object has key-value pairs. Much like an Array has indexes that contain values, Objects have keys (also known as properties) that hold value. 
 
 ```js
