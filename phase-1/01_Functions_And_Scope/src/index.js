@@ -74,51 +74,78 @@ const inventory = [
   
   // Start here!
   
-  
   // ✅ create a formatPrice(price) function that accepts a price (number) as an argument and returns the price formatted as a string.
   // formatPrice(10) => '$10.00'
-  
-  
+  function formatPrice(price) {
+    return `$${parseFloat(price).toFixed(2)}`
+  }
+ console.log(formatPrice(10))
+
   // ✅ create a blurb() function that accepts a book as an argument and returns a string in the following format:
   // 'Eloquent JavaScript: A Modern Introduction to Programming by Marjin Haverbeke is on sale for $10.00'
   
   // 💡 Difference between Block scope, Function scope, and Global scope
-  const globalVariable = "I am global"
+  const globalVariable = "I am global and accessible anywhere in the file"
+  console.log("🚀 ~ file: index.js:89 ~ globalVariable:", globalVariable)
   
+  
+    scopey()
   function scopey() {
+    //! Define four local/functional variables (available anywhere within the function FROM THIS LINE UNDER ⚠️)
     var a = "first Value";
     let b = "first Value";
     const c = "first Value";
-    d = "first Value";
+    d = "first Value"; // Implicit Global
   
     if (true) {
+    //! Define four block-scoped variables (only available within the block)
       var a = "second Value";
       let b = "second Value";
       const c = "second Value";
       d = "second Value";
     }
-  
+    
     // what will each statement log to the console?
     console.log("a (var) is,", a);
     console.log("b (let) is,", b);
     console.log("c (const) is,", c);
     console.log("d (evil) is,", d);
   }
-  
+
   // 💡 Arrow functions vs regular functions
-  
+  // FUNCTION DECLARATION
+    //   function formatPrice(price) {
+    //     return `$${parseFloat(price).toFixed(2)}`
+    //   }
+
+// ARROW FUNCTION EXPRESSION
+const formatPriceArrow = (price) => `$${parseFloat(price).toFixed(2)}`
+formatPriceArrow(10)
   // ✅ create an arrow function version of the formatPrice function
 
   
   // After Break
   
   // 💡 Practice using callbacks for iteration
+  function printSum(addNumbers) { // when a function is passed as arg is called a CALLBACK
+    return addNumbers
+  }
   
   // ✅ Create an array of the prices of all of the books
-  
+    // forEach
+    // const finalArray = []
+    // inventory.forEach(bookObj => finalArray.push(formatPrice(bookObj.price)))
+    // console.log(finalArray)
+
+    // map
+    const mappedArray = inventory.map(bookObj => console.log(formatPrice(bookObj.price)))
+    console.log(mappedArray)
   // ✅ Create an array of simplified book objects
 
   // ✅ Create an array of strings from the inventory in the following format:
   // 'Eloquent JavaScript: A Modern Introduction to Programming by Marjin Haverbeke is on sale for $10.00'
   
   // 💡 When do I use forEach vs map?
+  // forEach only iterates, it runs the callback for every element in the collection and then IT RETURNS undefined
+
+  // map will iterate the array, create a new array to be returned in the end, and in the process it populates the finalArray with whatever the callback RETURNS
