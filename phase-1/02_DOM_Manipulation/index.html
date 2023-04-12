@@ -10,8 +10,8 @@
     <!-- Data file -->
     <script src="src/data.js"></script>
     <!-- JavaScript file -->
-    <!-- defer - this file will load after the DOM loads -->
     <script defer src="src/index.js"></script>
+    <!-- defer - this file will load after the DOM loads -->
 
     <title>JS DOM Manipulation</title>
   </head>
@@ -28,7 +28,7 @@
         <div class="list">
           <ul id="book-list">
             <li class="list-li">
-              <h3>Eloquent JavaScript : A Modern Introduction to Programming</h3>
+              <h3 id="bookTitle">Eloquent JavaScript : A Modern Introduction to Programming</h3>
               <p>Marjin Haverbeke</p>
               <p>$10.00</p>
               <img src="https://images-na.ssl-images-amazon.com/images/I/51IKycqTPUL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg" alt="Eloquent JavaScript cover"/>
@@ -36,7 +36,11 @@
             </li>
           </ul>
         </div>
+
       </main>
+      
+      <div id="explanation">This is just to <strong>showcase</strong> the difference between: <br /><li>innerText</li><li>textContent</li><li>innerHTML</li> </div>
+
       <footer>
         <div id="store"></div>
         <div id="number"></div>
