@@ -101,4 +101,19 @@ function formatPrice(price) {
     //   <button>Delete</button>
     // </li>
 
-  
+  function renderBook(book){
+    const li = document.createElement("li")
+    li.className = "list-li"
+    const h3 = document.createElement("h3")
+    h3.innerText = book.title
+    const p1 = document.createElement("p1")
+    p1.innerText = book.author
+    const p2 = document.createElement("p2")
+    p2.innerText = formatPrice(price)
+    const img = document.createElement("img")
+    img.src = book.imageUrl
+    img.alt = book.title + 'cover'
+    const btn = document.createElement("btn")
+    button.innerText = "Delete"
+    li.append(h3, p1, p2, img, btn)
+  }
