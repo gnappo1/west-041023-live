@@ -5,20 +5,20 @@
 //TODO 3. Decide if creating the callback anonymously in-place OR pass a function reference (promotes reusability)
 //TODO 4. Does the callback have access to all the data it needs or should it receive parameters?
 
-////////////////////////////////////////////////////////////////
+
 // Yesterday's Code
 ////////////////////////////////////////////////////////////////
 
-console.log(bookStore);
+// console.log(bookStore);
 
 function formatPrice(price) {
   return '$' + Number.parseFloat(price).toFixed(2);
 }
-function setHeader() {
+function setHeader(bookStore) {
     const h1 = document.querySelector("#store-name")
     h1.innerText = bookStore.name
 }
-function changeFooter() {
+function changeFooter(bookStore) {
     const divName = document.getElementById("store")
     divName.innerText = bookStore.name
     const divAddress = document.getElementById("address")
@@ -75,10 +75,10 @@ function renderBookAsHTML(book) {
     `
 }
 
-setHeader()
-changeFooter()
-bookStore.inventory.forEach(bookObj => renderBookAsHTML(bookObj))
-// bookStore.inventory.forEach(renderBook) this line leverages JS magic BUT IT'S IDENTICAL TO THE ONE ABOVE
+// setHeader()
+// changeFooter()
+// bookStore.inventory.forEach(bookObj => renderBookAsHTML(bookObj))
+// // bookStore.inventory.forEach(renderBook) this line leverages JS magic BUT IT'S IDENTICAL TO THE ONE ABOVE
 
 ////////////////////////////////////////////////////////////////
 // Today's Code
@@ -135,7 +135,7 @@ form.addEventListener("submit", e => {
         price,
         inventory
     }
-    bookStore.inventory.push(bookObj) //* desperate attempt to persist the book across page rerendering! The correct way will be showcased next week!
+    // bookStore.inventory.push(bookObj) //* desperate attempt to persist the book across page rerendering! The correct way will be showcased next week!
     renderBookAsHTML(bookObj) //* put new book on the page
     e.target.reset() //* empty each input in the form
     form.classList.toggle("collapsed") //* toggle visibility
@@ -154,3 +154,45 @@ window.addEventListener('keydown', e => {
         // }
     }
 })
+
+
+////////////////////////////////////////////////////////////////\
+//* FETCH LECTURE
+//! Access Data From the json-server and leverage the existing functions to make sure we still see the books and store details
+
+// let bookStore = null
+const fetchStoreData = () => { 
+
+    fetch("http://localhost:3000/stores/1") //! returns a Promise object, just like .then()
+    .then(response => {
+        if (response.ok) { // if the request did go through but the server produced an error, then throw an error and let us know
+            return response.json() //! DO NOT FORGET TO RETURN IT
+        } else {
+            throw("Soemthing went wrong!")
+        }
+    })
+    .then(data => {
+        setHeader(data)
+        changeFooter(data)
+    })
+    .catch(error => alert(error)) // if request does not go through, catch error and alert us
+}
+fetchStoreData()
+
+const fetchBookData = () => { 
+
+    fetch("http://localhost:3000/books")
+    .then(response => {
+        if (response.ok) { // if the request did go through but the server produced an error, then throw an error and let us know
+            return response.json()
+        } else {
+            throw("Something went wrong!")
+        }
+    })
+    .then(booksArray => {
+        booksArray.forEach(bookObj => renderBookAsHTML(bookObj))
+    })
+    .catch(error => alert(error)) // if request does not go through, catch error and alert us
+}
+fetchBookData()
+////////////////////////////////////////////////////////////////
