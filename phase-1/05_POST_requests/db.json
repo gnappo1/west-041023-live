@@ -23,6 +23,30 @@
       "number": 5554443333,
       "name": "Tech BooksRus",
       "hours": "Thursday - Saturday 11am - 7pm"
+    },
+    {
+      "location": "LaLaLand",
+      "address": "555 Shangri-La",
+      "number": "555-555-5555",
+      "name": "BooksRUs",
+      "hours": "Monday - Friday 9am - 6pm",
+      "id": 4
+    },
+    {
+      "location": "LaLaLand",
+      "address": "555 Shangri-La",
+      "number": "555-555-5555",
+      "name": "BooksRUs",
+      "hours": "Monday - Friday 9am - 6pm",
+      "id": 5
+    },
+    {
+      "location": "LaLaLand",
+      "address": "555 Shangri-La",
+      "number": "555-555-5555",
+      "name": "BooksRUs",
+      "hours": "Monday - Friday 9am - 6pm",
+      "id": 6
     }
   ],
   "books": [
@@ -135,6 +159,24 @@
       ],
       "inventory": 20,
       "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/41oYsXjLvZL._SY344_BO1,204,203,200_.jpg"
+    },
+    {
+      "title": "tesdt",
+      "author": "tyest",
+      "price": 1,
+      "reviews": [],
+      "inventory": 1,
+      "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/51IKycqTPUL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg",
+      "id": 8
+    },
+    {
+      "title": "test 2",
+      "author": "Matteo",
+      "price": 1,
+      "reviews": [],
+      "inventory": 111,
+      "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/51IKycqTPUL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg",
+      "id": 9
     }
   ]
 }

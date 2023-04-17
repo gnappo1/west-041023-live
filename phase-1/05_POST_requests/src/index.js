@@ -206,14 +206,69 @@ bookForm.addEventListener('submit', (e) => {
     imageUrl: e.target.imageUrl.value
   }
   // pass the info as an argument to renderBook for display!
-  renderBook(book);
+  // renderBook(book);
   // 1. Add the ability to perist the book to the database when the form is submitted. When this works, we should still see the book that is added to the DOM on submission when we refresh the page.
-
+  const configObj = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(book)
+  }
+  fetch("http://localhost:3000/books", configObj)
+  .then(resp => {
+    if (resp.ok) {
+      return resp.json()
+    } else {
+      throw(`The book could not be created: ${resp.statusText}`)
+    }
+  })
+  .then(createdBook =>  renderBook(createdBook))
   e.target.reset();
 })
 
 // 2. Hook up the new Store form so it that it works to add a new store to our database and also to the DOM (as an option within the select tag)
+// const storeForm = document.querySelector("store-form")
 
+const handleSubmit = (event) => {
+  event.preventDefault()
+  // debugger
+  const store = {
+    "location": event.target['location'].value,
+      "address": event.target['address'].value,
+      "number": event.target['number'].value,
+      "name": event.target['name'].value,
+      "hours": event.target['hours'].value
+  }
+  fetch("http://localhost:3000/stores", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(store)
+  })
+  .then(response => {
+    if (response.status === 201) {
+      return response.json()
+    } else {
+      throw(`The store could not be created: ${resp.statusText}`)
+    }
+  })
+  .then(storeJSON => {
+    // put the store name in the dropdown and make sure we can use the change event on it
+    addSelectOptionForStore(storeJSON)
+    // clear form
+    event.target.reset()
+    //collapse it
+    const toggleStoreForm = storeForm.classList.toggle('collapsed');
+    if (toggleStoreForm) {
+      toggleStoreFormButton.textContent = "New Store";
+    } else {
+      toggleStoreFormButton.textContent = "Hide Store Form";
+    }
+  })
+}
+storeForm.addEventListener("submit", handleSubmit)
 // we're filling in the storeForm with some data
 // for a new store programatically so we don't 
 // have to fill in the form every time we test
