@@ -1,0 +1,135 @@
+/* allows us to animate a collapsed element appearing after a click  */
+.collapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+header {
+  background-image: url("assets/books.png");
+  height: 10%;
+  min-height: 88px;
+  opacity: 0.8;
+  border-top: solid;
+  border-width: 30px;
+  border-color: #103f22;
+}
+
+header div h1, header div h2 {
+  text-align: center;
+  color: aliceblue;
+  text-shadow: 2px 4px #252525;
+  font-family: Verdana;
+}
+
+header div h2 {
+  color: aliceblue;
+  font-style: italic;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.list ul {
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-li {
+  list-style: none;
+  width: 200px;
+  box-shadow: 4px 4px 10px #c9c8c8;
+  padding: 5px;
+  margin: 10px;
+}
+
+.list-li h3 {
+  height: 70px;
+}
+
+.list-li img {
+  width: 190px;
+  height: 265px;
+}
+
+.list-li button {
+  width: 190px;
+  margin: 15px 5px 15px 5px;
+  border: none;
+  background-color: #fce043;
+  color: rgb(255, 255, 255);
+  padding: 3px;
+  font-size: large;
+  font-weight: bold;
+}
+
+#form-wrapper {
+  border-top: solid;
+  border-bottom: solid;
+  border-width: thin;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+label {
+  font-family: Verdana;
+}
+
+input {
+  height: 40px;
+  width: 100%;
+  margin: 3px;
+}
+
+input[type=submit] {
+  border: none;
+  background-color: #2e824d;
+  color: rgb(255, 255, 255);
+  padding: 3px;
+  font-size: large;
+  font-weight: bold;
+}
+
+button, [type="submit"] {
+  cursor: pointer;
+}
+
+form {
+  margin: 10px auto;
+  width: 400px; 
+  max-height: 371px;
+  transition: max-height 300ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  text-align: center;
+}
+
+.book-inventory-form {
+  width: 100%;
+}
+
+.book-inventory-form input {
+  height: 30px;
+  width: 100%;
+  margin: 3px;
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  text-align: center;
+  background: lightcoral;
+  padding: 20px;
+}
