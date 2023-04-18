@@ -62,17 +62,6 @@ function addSelectOptionForStore(store) {
   storeSelector.append(option);
 }
 
-// function: renderBook(book)
-// --------------------------
-// accepts a book object as an argument and creates
-// an li something like this:
-// <li class="list-li">
-//   <h3>Eloquent JavaScript</h3>
-//   <p>Marjin Haverbeke</p>
-//   <p>$10.00</p>
-//   <img src="https://images-na.ssl-images-amazon.com/images/I/51IKycqTPUL._SX218_BO1,204,203,200_QL40_FMwebp_.jpg" alt="Eloquent JavaScript cover"/>
-// </li>
-// appends the li to the ul#book-list in the DOM
 function renderBook(book) {
   const li = document.createElement('li');
   li.className = 'list-li';
@@ -281,6 +270,6 @@ editStoreBtn.addEventListener('click', (e) => {
   const selectedStoreId = document.querySelector('#store-selector').value;
   storeEditMode = true;
   getJSON(`http://localhost:3000/stores/${selectedStoreId}`)
-    .then(populateStoreEditForm)
+  .then(populateStoreEditForm)
 })
 
