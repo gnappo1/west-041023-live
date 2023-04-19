@@ -83,6 +83,29 @@ function renderBook(book) {
   inventoryInput.className = 'inventory-input';
   inventoryInput.value = book.inventory;
   inventoryInput.min = 0;
+  inventoryInput.addEventListener("change", e => {
+    //! figure out what the new inventory number should become
+    const newInventory = e.target.value
+    //! fire a PATCH fetch call letting the server know
+    fetch(`http://localhost:3000/books/${book.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inventory: Number(e.target.value)
+      })
+    })
+    // .then(resp => {
+    //   if (resp.ok) {
+    //     return resp.json()
+    //   } else {
+    //     throw("The request did not go through. ")
+    //   }
+    // })
+    // .then(data => {})
+    // .catch(err => alert(err))
+  })
   li.append(inventoryInput);
   
   const pStock = document.createElement('p');
@@ -105,7 +128,16 @@ function renderBook(book) {
   btn.textContent = 'Delete';
 
   btn.addEventListener('click', (e) => {
-    li.remove();
+    // fire call to server here
+    li.remove(); // update the UI for the user
+    fetch(`http://localhost:3000/books/${book.id}`, {
+      method: "DELETE"
+    })
+    .then(response => {
+      if (response.status !== 204) {
+        document.querySelector('#book-list').append(li)
+      }
+    })
   })
   li.append(btn);
 
