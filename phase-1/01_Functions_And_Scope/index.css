@@ -1,0 +1,13 @@
+div {
+    background-image: url("assets/books.png");
+    height: 50%;
+    opacity: 0.7;
+  }
+  
+  h1 {
+    text-align: center;
+    color: aliceblue;
+    padding: 200px 0;
+    text-shadow: 2px 4px #252525;
+    font-family: Verdana;
+  }

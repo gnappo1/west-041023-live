@@ -1,0 +1,22 @@
+#search {
+    width: 50%;
+    margin-left: 20%;
+}
+
+#submit-btn {
+    width: 10%;
+}
+
+#results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.card {
+    width: 32%
+}
+
+.show-img {
+    width: 60%;
+}

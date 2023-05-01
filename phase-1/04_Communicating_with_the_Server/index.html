@@ -1,0 +1,59 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   
+
+    <link rel="stylesheet" href="index.css">
+    <!-- <script defer src="src/data.js"></script> -->
+    <script defer src="src/index.js"></script>
+    
+
+    <title>JS Communicating with the Server</title>
+  </head>
+  <body>
+    <div class="list" id="header">
+      <header>
+        <div>
+          <h1 id="store-name"></h1>
+          <div id="banner"></div>
+        </div>
+      </header>
+      <main>
+        <div id="form-wrapper">
+          <button id="toggleForm">New Book</button>
+          <form id="book-form" class="collapsed">
+          
+            <label for="form-title">Title:</label>
+            <input type="text" id="form-title" name="title"  />
+  
+            <label for="form-author">Author:</label>
+            <input type="text" id="form-author" name="author"  />
+          
+            <label for="form-price">Price:</label>
+            <input type="text" id="form-price" name="price"  />
+          
+            <label for="form-imageUrl">Image url:</label>
+            <input type="text" id="form-imageUrl" name="imageUrl"  />
+          
+            <label for="form-inventory">Inventory:</label>
+            <input type="number" id="form-inventory" name="inventory"  />
+
+            <input type="submit" value="ADD BOOK"/>
+          </form>
+        </div>
+        <div class="list">
+          <ul id="book-list">
+          </ul>
+        </div>
+      </main>
+      <footer>
+        <div id="store"></div>
+        <div id="number"></div>
+        <div id="address"></div>
+      </footer>
+    </div>
+  </body>
+  
+</html>
