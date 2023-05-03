@@ -1,18 +1,35 @@
 import ProjectListItem from "./ProjectListItem";
 import { useState } from 'react'
 
-const ProjectList = ({ projects }) => {
-  const [userQuery, setUserQuery] = useState("");
-  const [phaseSelected, setPhaseSelected] = useState("All");
+const ProjectList = ({userQuery, phaseSelected}) => {
+  const [projects, setProjects] = useState([]);
 
-  const handleChange = (e) => {
-    const value = e.target.value
-    setUserQuery(value)
+  const handleFetchAsync = async () => {
+    try {
+      const resp = await fetch(' http://localhost:4000/projects')
+      if (resp.status === 200) {
+        const projectList = await resp.json()
+        setProjects(projectList)
+      } else {
+        throw new Error('Could not complete the request! Check request parameters please.')
+      }
+    } catch (error) {
+      alert(error)
+    }
   }
 
-  const handleClick = (e) => {
-    const intValue = parseInt(e.target.textContent.slice(-1))
-    e.target.textContent === "All" ? setPhaseSelected("All") : setPhaseSelected(intValue)
+  const handleFetchTraditional = async () => {
+    fetch(' http://localhost:4000/projects')
+    .then(resp => {
+      resp.json().then(data => {
+        if (resp.status === 200) {
+          setProjects(data)
+        } else {
+          throw new Error('Could not complete the request! Check request parameters please.')
+        }
+      })
+    })
+    .catch(error =>  alert(error))
   }
   
   //TODO Showcase the different ways we could have handled the double filtering
@@ -44,18 +61,8 @@ const ProjectList = ({ projects }) => {
 
   return (
     <section>
+      <button onClick={handleFetchTraditional}>Load Projects</button>
       <h2>Projects</h2>
-
-      <div className="filter">
-        <button onClick={handleClick}>All</button>
-        <button onClick={handleClick}>Phase 5</button>
-        <button onClick={handleClick}>Phase 4</button>
-        <button onClick={handleClick}>Phase 3</button>
-        <button onClick={handleClick}>Phase 2</button>
-        <button onClick={handleClick}>Phase 1</button>
-      </div>
-      <input type="text" onChange={handleChange} placeholder="Search project by name..."/>
-
       <ul className="cards">{projectListItems}</ul>
     </section>
   );

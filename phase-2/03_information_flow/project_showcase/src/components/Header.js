@@ -1,7 +1,7 @@
 // Attach a 'click' event to the button that invokes the callback function handleClick
 
 const Header = ({handleClick, darkModeOn}) => {
-  
+
   return (
     <header>
       <h1>
