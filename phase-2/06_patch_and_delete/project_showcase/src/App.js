@@ -91,6 +91,10 @@ const App = () => {
     })
   }
 
+  const handleProjectDelete = (projectToDeleteId) => {
+    setProjects(currentProjects => currentProjects.filter(project => project.id !== projectToDeleteId))
+  }
+
   const resetEditingModeToNull = () => {
     setProjectId(null)
   }
@@ -102,7 +106,7 @@ const App = () => {
       {showTimer ? <Timer /> : null}
       {projectId ? <EditProjectForm resetEditingModeToNull={resetEditingModeToNull} projectId={projectId} handleUpdateProject={handleUpdateProject}/> : <ProjectForm handleNewProject={handleNewProject}/>}
       <ProjectFilter handleClick={handlePhaseClick} handleChange={handleChange} />
-      <ProjectList handleSetProjectId={handleSetProjectId} projects={projects} userQuery={userQuery} phaseSelected={phaseSelected} />
+      <ProjectList handleProjectDelete={handleProjectDelete} handleSetProjectId={handleSetProjectId} projects={projects} userQuery={userQuery} handleNewProject={handleNewProject} phaseSelected={phaseSelected} />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 
-const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProjectId }) => {
-  let [clapCount, setClapCount] = useState(0)
+const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProjectId, claps=0, handleProjectDelete, handleNewProject }) => {
+  let [clapCount, setClapCount] = useState(claps)
 
   const handleClick = () => {
     //! SUPER INCORRECT
@@ -13,7 +13,36 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
     // setClapCount(newValue)
    
     //* CORRECT
-    setClapCount(currentClaps => currentClaps + 1)
+    // setClapCount(currentClaps => currentClaps + 1)
+    fetch(`http://localhost:4000/projects/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({claps: clapCount + 1})
+    })
+    .then(resp => {
+      if (resp.status !== 200) {
+        // setClapCount(currentClaps => currentClaps - 1)
+        alert(resp.statusText)
+      } else {
+        resp.json().then(updatedObj => setClapCount(updatedObj.claps))
+      }
+    })
+
+  }
+
+  const handleDelete = () => {
+    //! Modify local state using the function that App passed
+    handleProjectDelete(id)
+    //! Fire a DELETE fetch call to the json-server
+    fetch(`http://localhost:4000/projects/${id}`, {
+      method: "DELETE"
+    }).then((resp) =>  {
+      if (resp.status !== 200) {
+        handleNewProject({ id, about, image, link, name, phase, claps })
+      }
+    })
   }
 
   return (
@@ -41,7 +70,7 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
           <button onClick={() => handleSetProjectId(id)}>
             <FaPencilAlt />
           </button>
-          <button onClick={() => console.log("edit me!")}>
+          <button onClick={handleDelete}>
             <FaTrash />
           </button>
         </div>
