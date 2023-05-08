@@ -1,7 +1,7 @@
 import ProjectListItem from "./ProjectListItem";
 
 
-const ProjectList = ({userQuery, phaseSelected, projects}) => {
+const ProjectList = ({userQuery, phaseSelected, projects, handleSetProjectId}) => {
 
 
   
@@ -29,7 +29,7 @@ const ProjectList = ({userQuery, phaseSelected, projects}) => {
 
   const queryFilteredProjects = projects.filter(project => (filterBy(project, "name") || filterBy(project, 'about')) && phaseSelection(project))
   
-  const projectListItems = queryFilteredProjects.map((project) => <ProjectListItem key={project.id} {...project} />);
+  const projectListItems = queryFilteredProjects.map((project) => <ProjectListItem key={project.id} handleSetProjectId={handleSetProjectId} {...project} />);
 
 
   return (

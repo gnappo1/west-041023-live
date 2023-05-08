@@ -5,6 +5,7 @@ import ProjectForm from "./components/ProjectForm";
 import ProjectList from "./components/ProjectList";
 import ProjectFilter from "./components/ProjectFilter";
 import Timer from "./components/Timer";
+import EditProjectForm from "./components/EditProjectForm";
 // import projects from './projects'
 
 const App = () => {
@@ -16,8 +17,12 @@ const App = () => {
   const [userQuery, setUserQuery] = useState("");
   const [phaseSelected, setPhaseSelected] = useState("All");
   const [projects, setProjects] = useState([]);
+  const [projectId, setProjectId] = useState(null);
 
-  
+  const handleSetProjectId = (newProjectId) => {
+    setProjectId(newProjectId)
+  }
+
   const handleFetchAsync = async () => {
     try {
       const resp = await fetch(' http://localhost:4000/projects')
@@ -62,8 +67,6 @@ const App = () => {
     setProjects(currentProjects => [...currentProjects, newProjectObj])
   }
 
-
-
   const handleChange = (e) => {
     const value = e.target.value
     setUserQuery(value)
@@ -73,25 +76,33 @@ const App = () => {
     const intValue = parseInt(e.target.textContent.slice(-1))
     e.target.textContent === "All" ? setPhaseSelected("All") : setPhaseSelected(intValue)
   }
-  // # Deliverable 1: Configure a <button> in our App 
-  // that will use json-server to fetch projects 
-  // and store them in state
 
-  // - Add an onClick event listener to the "Load Projects" 
-  // button
+  const handleUpdateProject = (updatedProjectObj) => {
+    setProjects(currentProjects => {
+      // const newProjectsState = currentProjects.map(project => {
+      //   if (project.id === updatedProjectObj.id ) {
+      //     return updatedProjectObj
+      //   } else {
+      //     return project
+      //   }
+      // })
+      return currentProjects.map(project => project.id === updatedProjectObj.id ? updatedProjectObj : project)
 
-  // - When the button is clicked, make a fetch 
-  // request to "http://localhost:4000/projects"
-  // and set the `projects` state to the value 
-  // returned by the response
+    })
+  }
+
+  const resetEditingModeToNull = () => {
+    setProjectId(null)
+  }
+
   return (
     <div className={darkModeOn ? "App" : "App light"}>
       <Header handleClick={handleClick} darkModeOn={darkModeOn}/>
       <button onClick={() => setShowTimer(currentVal => !currentVal)}>Toggle Timer</button>
       {showTimer ? <Timer /> : null}
-      <ProjectForm handleNewProject={handleNewProject}/>
+      {projectId ? <EditProjectForm resetEditingModeToNull={resetEditingModeToNull} projectId={projectId} handleUpdateProject={handleUpdateProject}/> : <ProjectForm handleNewProject={handleNewProject}/>}
       <ProjectFilter handleClick={handlePhaseClick} handleChange={handleChange} />
-      <ProjectList projects={projects} userQuery={userQuery} phaseSelected={phaseSelected} />
+      <ProjectList handleSetProjectId={handleSetProjectId} projects={projects} userQuery={userQuery} phaseSelected={phaseSelected} />
     </div>
   );
 };
