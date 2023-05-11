@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { ProjectContext } from '../context/projectContext';
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import {Link} from 'react-router-dom'
-const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProjectId, claps=0, handleProjectDelete, handleNewProject }) => {
+const ProjectListItem = ({ id, about, image, link, name, phase, claps=0 }) => {
   let [clapCount, setClapCount] = useState(claps)
 
+  const {dispatch} = useContext(ProjectContext)
   const handleClick = () => {
     //! SUPER INCORRECT
     // ++clapCount
@@ -34,13 +36,13 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
 
   const handleDelete = () => {
     //! Modify local state using the function that App passed
-    handleProjectDelete(id)
+    dispatch({type: 'remove', payload: id})
     //! Fire a DELETE fetch call to the json-server
     fetch(`http://localhost:4000/projects/${id}`, {
       method: "DELETE"
     }).then((resp) =>  {
       if (resp.status !== 200) {
-        handleNewProject({ id, about, image, link, name, phase, claps })
+        dispatch({type: 'add', payload: {id, about, image, link, name, phase, claps} })
       }
     })
   }
@@ -67,9 +69,9 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
       <footer className="extra">
         <span className="badge blue">Phase {phase}</span>
         <div className="manage">
-          <button onClick={() => handleSetProjectId(id)}>
+          <Link className='button' to={`/projects/${id}/edit`}>
             <FaPencilAlt />
-          </button>
+          </Link>
           <button onClick={handleDelete}>
             <FaTrash />
           </button>

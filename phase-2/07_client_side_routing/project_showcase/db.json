@@ -2,7 +2,7 @@
   "projects": [
     {
       "id": 1,
-      "name": "Great Outdoors Guide Nb. 2",
+      "name": "Great Outdoors Guide Nb. 222",
       "about": "Plan your next adventure to in the U.S. National Parks!",
       "phase": 4,
       "link": "https://great-outdoors-guide.netlify.app",
@@ -88,15 +88,6 @@
       "phase": 4,
       "link": "https://www.locksleyr.com",
       "image": "https://i.imgur.com/XOnaclL.png",
-      "claps": 0
-    },
-    {
-      "id": 25,
-      "name": "GamesRx",
-      "about": "Game info and reviews",
-      "phase": 4,
-      "link": "https://gamesrx.netlify.app",
-      "image": "https://i.imgur.com/Japzh6v.png",
       "claps": 0
     }
   ]

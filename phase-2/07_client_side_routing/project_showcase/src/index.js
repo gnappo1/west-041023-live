@@ -10,6 +10,7 @@
 
   import React from "react";
   import ReactDOM from "react-dom/client";
+  import { ProjectProvider } from "./context/projectContext";
   import {BrowserRouter as Router} from "react-router-dom"
   import "./index.css";
   
@@ -17,10 +18,10 @@
   const root = ReactDOM.createRoot(document.getElementById("root"));
 
   root.render(
-      // <React.StrictMode>
+    <ProjectProvider>
       <Router>
           <App />
       </Router>
-      // </React.StrictMode>
+    </ProjectProvider>
   );
   

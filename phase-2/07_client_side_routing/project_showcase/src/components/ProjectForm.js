@@ -1,6 +1,22 @@
-import {useState} from 'react'
+import {useState, useReducer, useRef, useContext} from 'react'
+import { ProjectContext } from '../context/projectContext';
 import { useHistory } from 'react-router-dom';
 // import { uuid } from 'uuidv4';
+
+const initialState = {
+  name: "",
+  about: "",
+  phase: "",
+  link: "",
+  image: ""
+}
+
+const reducer = (state, {key, value}) => {
+  return {
+    ...state,
+    [key]: value
+  }
+}
 
 const ProjectForm = ({handleNewProject}) => {
 
@@ -9,24 +25,28 @@ const ProjectForm = ({handleNewProject}) => {
   // const [phase, setPhase] = useState("");
   // const [link, setLink] = useState("");
   // const [image, setImage] = useState("");
+const [state, dispatchTwo] = useReducer(reducer, initialState)
+const {dispatch} = useContext(ProjectContext)
 
-  const [newProject, setNewProject] = useState({
-    name: "",
-    about: "",
-    phase: "",
-    link: "",
-    image: ""
-  });
+  // const [newProject, setNewProject] = useState({
+  //   name: "",
+  //   about: "",
+  //   phase: "",
+  //   link: "",
+  //   image: ""
+  // });
   const history = useHistory()
+  const inputRef = useRef(null)
 
-  const validateData = () =>  [newProject.name, newProject.about, newProject.link, newProject.image, newProject.phase].some(el => el.trim() === '' )
+  console.log(inputRef)
+  const validateData = () =>  [state.name, state.about, state.link, state.image, state.phase].some(el => el.trim() === '' )
 
   const handleChange = ({target: {id, value}}) => {
-    
-    setNewProject({
-      ...newProject,
-      [id]: value
-    })
+    dispatchTwo({key:id, value})
+  //   setNewProject({
+  //     ...newProject,
+  //     [id]: value
+  //   })
   }
 
   const handleSubmit = (e) => {
@@ -34,6 +54,15 @@ const ProjectForm = ({handleNewProject}) => {
     if (validateData()) {
       alert("Please fill out the entire form!")
     } else {
+
+      // const formData = new FormData(e.target)
+      // formData.append('upload', inputRef.current.files[0])
+      // for (const val of formData.entries()){
+      //   console.log(val)
+      // }
+
+      // const files = Array.from(e.target['file'].files)
+      // console.log(files)
       // the new project object has to make it to the page
       // const newProject = {name, about, phase, link, image}
       // the new project has to make it to the json-server
@@ -42,12 +71,12 @@ const ProjectForm = ({handleNewProject}) => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(newProject)
+        body: JSON.stringify(state)
       })
       .then(resp => {
         if (resp.status === 201) {
           resp.json()
-          .then(projectFromDb => handleNewProject(projectFromDb))
+          .then(projectFromDb => dispatch({type: 'add', payload: projectFromDb}))
           .then(() => history.push("/projects"))
         } else {
           alert("Something went wrong, try again!")
@@ -70,13 +99,13 @@ const ProjectForm = ({handleNewProject}) => {
         <h3>Add New Project</h3>
 
         <label htmlFor="name">Name</label>
-        <input type="text" id="name" name="name" onChange={handleChange} value={newProject.name} required/>
+        <input type="text" id="name" name="name" onChange={handleChange} value={state.name} required/>
 
         <label htmlFor="about">About</label>
-        <textarea id="about" name="about" onChange={handleChange} value={newProject.about} required/>
+        <textarea id="about" name="about" onChange={handleChange} value={state.about} required/>
 
         <label htmlFor="phase">Phase</label>
-        <select name="phase" id="phase" onChange={handleChange} value={newProject.phase} required>
+        <select name="phase" id="phase" onChange={handleChange} value={state.phase} required>
           <option>Select One</option>
           <option value="1">Phase 1</option>
           <option value="2">Phase 2</option>
@@ -86,10 +115,13 @@ const ProjectForm = ({handleNewProject}) => {
         </select>
 
         <label htmlFor="link">Project Homepage</label>
-        <input type="text" id="link" name="link" onChange={handleChange} value={newProject.link} required/>
+        <input type="text" id="link" name="link" onChange={handleChange} value={state.link} required/>
 
         <label htmlFor="image">Screenshot</label>
-        <input type="text" id="image" name="image" onChange={handleChange} value={newProject.image} required/>
+        <input type="text" id="image" name="image" onChange={handleChange} value={state.image} required/>
+        
+        <label htmlFor="image">File Upload</label>
+        <input type="file" id="file" name="file" ref={inputRef} required/>
 
         <button type="submit">Add Project</button>
       </form>

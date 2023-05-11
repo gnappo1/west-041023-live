@@ -1,8 +1,9 @@
 import ProjectListItem from "./ProjectListItem";
+import { useContext } from "react";
+import { ProjectContext } from "../context/projectContext";
 
-
-const ProjectList = ({userQuery, phaseSelected, projects, handleSetProjectId, handleProjectDelete, handleNewProject}) => {
-
+const ProjectList = ({userQuery, phaseSelected, handleSetProjectId, handleProjectDelete, handleNewProject}) => {
+  const {projects} = useContext(ProjectContext);
 
   
   //TODO Showcase the different ways we could have handled the double filtering
@@ -29,7 +30,7 @@ const ProjectList = ({userQuery, phaseSelected, projects, handleSetProjectId, ha
 
   const queryFilteredProjects = projects.filter(project => (filterBy(project, "name") || filterBy(project, 'about')) && phaseSelection(project))
   
-  const projectListItems = queryFilteredProjects.map((project) => <ProjectListItem key={project.id} handleProjectDelete={handleProjectDelete} handleNewProject={handleNewProject}  handleSetProjectId={handleSetProjectId} {...project} />);
+  const projectListItems = queryFilteredProjects.map((project) => <ProjectListItem key={project.id}  {...project} />);
 
 
   return (
