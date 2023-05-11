@@ -4,6 +4,7 @@
   // - Convert any html anchor tags to `Link` or `NavLink`
 
   // - Demonstrate the difference between `Link` and `NavLink`
+import {Link, NavLink} from 'react-router-dom'
 
   const Header = ({handleClick, darkModeOn}) => {
     const buttonTextContent = darkModeOn ? "Light Mode" : "Dark Mode";
@@ -12,16 +13,18 @@
       <header>
         <nav>
           <h1 className="branding">
+          <NavLink to="/">
             <span className="logo">{"//"}</span>
             Project Showcase
+            </NavLink>
           </h1>
           <div className="navigation">
-            <a className="button" href="/projects">
+            <NavLink exact className="button" to="/projects">
               All Projects
-            </a>
-            <a className="button" href="/projects/new">
+            </NavLink>
+            <NavLink className="button" to="/projects/new">
               Add Project
-            </a>
+            </NavLink>
             <button onClick={handleClick}>{buttonTextContent}</button>
           </div>
         </nav>

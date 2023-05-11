@@ -1,8 +1,13 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import {Link, useLocation} from 'react-router-dom'
+import { ProjectContext } from '../context/projectContext'
 
-const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProjectId, claps=0, handleProjectDelete, handleNewProject }) => {
+
+const ProjectListItem = ({ id, about, image, link, name, phase, claps=0, handleNewProject }) => {
   let [clapCount, setClapCount] = useState(claps)
+  const {handleProjectDelete} = useContext(ProjectContext);
+  const location = useLocation()
 
   const handleClick = () => {
     //! SUPER INCORRECT
@@ -55,7 +60,7 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
       </figure>
 
       <section className="details">
-        <h4>{name}</h4>
+        <Link to={{pathname: `/projects/${id}`, state: {about}}}><h4>{name}</h4></Link>
         <p>{about}</p>
         {link ? (
           <p>
@@ -67,9 +72,9 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
       <footer className="extra">
         <span className="badge blue">Phase {phase}</span>
         <div className="manage">
-          <button onClick={() => handleSetProjectId(id)}>
+          <Link className="button" to={`/projects/${id}/edit`}>
             <FaPencilAlt />
-          </button>
+          </Link>
           <button onClick={handleDelete}>
             <FaTrash />
           </button>

@@ -15,13 +15,19 @@
 
   // - Demonstrate the use of the `exact` prop passed to the `Route` 
   // component
-  import { useState, useEffect } from "react";
+  import { useState } from "react";
 
   import Header from "./components/Header";
   import ProjectForm from "./components/ProjectForm";
+  import Home from "./components/Home";
   import ProjectList from "./components/ProjectList";
   import ProjectFilter from "./components/ProjectFilter";
   import EditProjectForm from "./components/EditProjectForm";
+  import Error from "./components/Error";
+  import ProjectDetail from "./components/ProjectDetail";
+  import Test from './components/Test'
+  import {Switch, Route} from 'react-router-dom'
+
   // import projects from './projects'
   
   const App = () => {
@@ -31,55 +37,12 @@
     const [darkModeOn, setDarkModeOn] = useState(false);
     const [userQuery, setUserQuery] = useState("");
     const [phaseSelected, setPhaseSelected] = useState("All");
-    const [projects, setProjects] = useState([]);
-    const [projectId, setProjectId] = useState(null);
-  
-    const handleSetProjectId = (newProjectId) => {
-      setProjectId(newProjectId)
-    }
-  
-    const handleFetchAsync = async () => {
-      try {
-        const resp = await fetch(' http://localhost:4000/projects')
-        if (resp.status === 200) {
-          const projectList = await resp.json()
-          setProjects(projectList)
-        } else {
-          throw new Error('Could not complete the request! Check request parameters please.')
-        }
-      } catch (error) {
-        alert(error)
-      }
-    }
-    
-    const handleFetchTraditional = () => {
-      fetch(' http://localhost:4000/projects')
-      .then(resp => {
-        resp.json().then(data => {
-          if (resp.status === 200) {
-            setProjects(data)
-          } else {
-            throw new Error('Could not complete the request! Check request parameters please.')
-          }
-        })
-      })
-      .catch(error =>  alert(error))
-    }
-  
-    useEffect(() => {
-      handleFetchTraditional()
-    }, [])
-  
-  
+
     const handleClick = (e) => {
       //! If you need to reference the current value to determine the new one: THIS IS WRONG!
       // setDarkModeOn(!darkModeOn)
       //! The preferred way is:
       setDarkModeOn(currentValue => !currentValue)
-    }
-  
-    const handleNewProject = (newProjectObj) => {
-      setProjects(currentProjects => [...currentProjects, newProjectObj])
     }
   
     const handleChange = (e) => {
@@ -92,34 +55,31 @@
       e.target.textContent === "All" ? setPhaseSelected("All") : setPhaseSelected(intValue)
     }
   
-    const handleUpdateProject = (updatedProjectObj) => {
-      setProjects(currentProjects => {
-        // const newProjectsState = currentProjects.map(project => {
-        //   if (project.id === updatedProjectObj.id ) {
-        //     return updatedProjectObj
-        //   } else {
-        //     return project
-        //   }
-        // })
-        return currentProjects.map(project => project.id === updatedProjectObj.id ? updatedProjectObj : project)
-  
-      })
-    }
-  
-    const handleProjectDelete = (projectToDeleteId) => {
-      setProjects(currentProjects => currentProjects.filter(project => project.id !== projectToDeleteId))
-    }
-  
-    const resetEditingModeToNull = () => {
-      setProjectId(null)
-    }
-  
     return (
       <div className={darkModeOn ? "App" : "App light"}>
         <Header handleClick={handleClick} darkModeOn={darkModeOn}/>
-        {projectId ? <EditProjectForm resetEditingModeToNull={resetEditingModeToNull} projectId={projectId} handleUpdateProject={handleUpdateProject}/> : <ProjectForm handleNewProject={handleNewProject}/>}
-        <ProjectFilter handleClick={handlePhaseClick} handleChange={handleChange} />
-        <ProjectList handleProjectDelete={handleProjectDelete} handleSetProjectId={handleSetProjectId} projects={projects} userQuery={userQuery} handleNewProject={handleNewProject} phaseSelected={phaseSelected} />
+        <Switch>
+          <Route path="/projects/:id/edit">
+            <EditProjectForm />
+          </Route>
+          <Route path="/projects/new">
+            <ProjectForm />
+          </Route>
+          <Route path="/projects/:id">
+            <ProjectDetail />
+          </Route>
+          <Route path="/projects">
+            <ProjectFilter handleClick={handlePhaseClick} handleChange={handleChange} />
+            <ProjectList userQuery={userQuery} phaseSelected={phaseSelected} />
+          </Route>
+          <Route exact path="/">
+            <Home />
+            <Test />
+          </Route>
+          <Route>
+            <Error />
+          </Route>
+        </Switch>
       </div>
     );
   };
