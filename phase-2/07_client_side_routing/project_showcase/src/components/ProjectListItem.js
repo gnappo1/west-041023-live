@@ -67,9 +67,9 @@ const ProjectListItem = ({ id, about, image, link, name, phase, handleSetProject
       <footer className="extra">
         <span className="badge blue">Phase {phase}</span>
         <div className="manage">
-          <button onClick={() => handleSetProjectId(id)}>
+          <Link className='button' to={`/projects/${id}/edit`}>
             <FaPencilAlt />
-          </button>
+          </Link>
           <button onClick={handleDelete}>
             <FaTrash />
           </button>

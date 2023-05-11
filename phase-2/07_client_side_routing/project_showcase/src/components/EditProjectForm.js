@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useParams, useHistory } from 'react-router-dom'
 
 const initialState = {
     name: "",
@@ -8,15 +9,15 @@ const initialState = {
     image: ""
 }
 
-const EditProjectForm = ({projectId, resetEditingModeToNull, handleUpdateProject}) => {
-    console.log(projectId)
+const EditProjectForm = ({handleUpdateProject}) => {
     const [formData, setFormData] = useState(initialState)
-
+    const {id} = useParams()
+    const history = useHistory()
     useEffect(() => {
-        fetch(`http://localhost:4000/projects/${projectId}`)
+        fetch(`http://localhost:4000/projects/${id}`)
         .then(resp => resp.json())
         .then(data => setFormData(data))
-    }, [projectId])
+    }, [id])
 
     const {name, about, phase, link, image} = formData
 
@@ -31,7 +32,7 @@ const EditProjectForm = ({projectId, resetEditingModeToNull, handleUpdateProject
         e.preventDefault()
         //! Figure out what new data looks like and maybe package it into one object => formData
         //! Fire the PATCH/PUT
-        fetch(`http://localhost:4000/projects/${projectId}`, {
+        fetch(`http://localhost:4000/projects/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json"
@@ -46,8 +47,9 @@ const EditProjectForm = ({projectId, resetEditingModeToNull, handleUpdateProject
             //TODO 2. Empty the form
             setFormData(initialState)
             //TODO 3. Let App know that we're not in editing mode anymore
-            resetEditingModeToNull()
+
         })
+        .then(() => history.push(`/projects/${id}`))
     }
 
     return (
