@@ -11,7 +11,6 @@
   import React from "react";
   import ReactDOM from "react-dom/client";
   import {BrowserRouter as Router} from "react-router-dom"
-  import { ProjectProvider } from "./context/projectContext";
   import "./index.css";
   
   import App from "./App";
@@ -19,11 +18,9 @@
 
   root.render(
       // <React.StrictMode>
-    <ProjectProvider>
       <Router>
           <App />
       </Router>
-    </ProjectProvider>
       // </React.StrictMode>
   );
   
