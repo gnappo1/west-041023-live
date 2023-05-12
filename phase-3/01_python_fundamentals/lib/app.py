@@ -8,12 +8,13 @@
 # 🚨 To enable ipdb debugging, first import "ipdb"
 import ipdb
 
-#* Initial Discussion
 
+#TODO Initial Discussion
 # 0. Style Guide (visit: https://peps.python.org/pep-0008/#code-lay-out)
 # 1. Data Types
 # 2. Variable Naming Conventions (visit https://peps.python.org/pep-0008/#naming-conventions)
 # 3. String Interpolation
+# 4. Printing to Console
 
 pet_mood = "Hungry!"
 pet_name = "Rose"
