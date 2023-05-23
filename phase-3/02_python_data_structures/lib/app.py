@@ -9,10 +9,15 @@
 pet_names = ['Rose', 'Meow Meow Beans', 'Mr.Legumes', 'Luke', 'Lea', 'Princess Grace', 'Spot', 'Tom', 'Mini', 'Paul']
 
 #TODO Reading Information From Lists
-#2. ✅ Return the first pet name
+#2. ✅ Return the last pet name
+# print(pet_names[-1])
 #3. ✅ Return all pet names beginning from the 3rd index [3:]
+# print(pet_names[3:])
 #4. ✅ Return all pet names before the 3rd index [:3]
+# print(pet_names[:3])
 #5. ✅ Return all pet names beginning from the 3rd index and up to / including the 7th index [3:7]
+# print(pet_names[3:8])
+print(pet_names[3:8])
 #6. ✅ Find the index of a given element => .index() or .find()
 #7. ✅ Read the original list in reverse order => [::-1] or destructively .reverse()
 #8. ✅ Return the frequency of a given element => .count()
