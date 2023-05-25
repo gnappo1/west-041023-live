@@ -2,7 +2,7 @@
 
 ## Learning Goals
 
-- Demonstrate Decorators 
+- Introduce Decorators 
     - `@decorator`
 - Demonstrate class attributes
     - Defining class attributes
@@ -12,5 +12,3 @@
     - `@classmethod`
     - `cls keyword`
 - Object Inheritance
-- Stretch Goals
-    - Super
