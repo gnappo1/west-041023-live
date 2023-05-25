@@ -15,7 +15,7 @@ class Owner():
             print(f"{owner.first_name}'s New Account Balance = ${final_balance}")
 
         return report_balance
-        
+
     # $100 Cost
     @balance_calculator
     def vet_visit(self, bill=100):

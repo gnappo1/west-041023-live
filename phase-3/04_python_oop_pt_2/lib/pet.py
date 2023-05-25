@@ -8,27 +8,62 @@ ALLOWED_LIST = ['name', 'age', 'temperament', 'breed', 'owner']
 class Pet:
 # ✅ Define a class attribute (total_pets) and set it to 0
 
-    __slots__= '_name', '_age', '_temperament', '_breed', '_owner'
-
+    # __slots__= '_name', '_age', '_temperament', '_breed', '_owner'
+    all = []
     # What happens with our instances when we add a class attribute?
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
-            setattr(self, f'_{k}', v) if f'_{k}' in ALLOWED_LIST else None
+            setattr(self, f'_{k}', v) if k in ALLOWED_LIST else None
             # self._name, self.age, self.breed, self.temperament, self.owner = name, age, breed, temperament, owner
-
+        type(self).save(self)
     # Using Property to control the behavior of attributes
-    def get_name(self):
+    @classmethod #=> classmethod()
+    def save(cls, new_obj):
+        cls.all.append(new_obj)
+    
+    @classmethod
+    def find_by(cls, attr, val): # find_by('name', 'Fido')
+        # return [pet for pet in cls.all if pet.__dict__[f'_{attr}'] == val]
+        final_list = [pet for pet in cls.all if getattr(pet, attr) == val]
+        return final_list[0] if final_list else "Sorry the pet doesn't seem to be in our records"
+    
+    @classmethod
+    def find_by2(cls, attr, val): # find_by('name', 'Fido')
+        for pet in cls.all:
+            if getattr(pet, attr) == val:
+                return pet
+        return "Sorry the pet doesn't seem to be in our records"
+        
+    @classmethod
+    def find_by3(cls, attr, val): # find_by('name', 'Fido')
+        return next(
+            (pet for pet in cls.all if getattr(pet, attr) == val),
+            "Sorry the pet doesn't seem to be in our records",
+        )
+        
+    @classmethod
+    def filter_by(cls, attr, val): # find_by('name', 'Fido')
+        # return [pet for pet in cls.all if pet.__dict__[f'_{attr}'] == val]
+        return [pet for pet in cls.all if getattr(pet, attr) == val]
+
+    @staticmethod
+    def static(pay, hours, sick_days):
+        print(pay, hours, sick_days)
+        
+    @property
+    def name(self):
         print("Inside the name property getter")
         return self._name
     
-    def set_name(self, new_name):
+    @name.setter
+    def name(self, new_name):
         print("Inside the name property setter")
         if type(new_name) is str and len(new_name) > 2:
             self._name = new_name
         else:
             raise TypeError("Value must be a string with more than 2 chars")
         
-    name = property(get_name, set_name)
+    # name = property(get_name, set_name)
     
     def get_breed(self):
         print("Inside the breed property getter")
@@ -82,8 +117,8 @@ class Pet:
         
     temperament = property(get_temperament, set_temperament)
 
-    def __repr__(self) -> str:
-        return f'Hello, I am {self.name} and I am {self.age} y.o.'
+    # def __repr__(self) -> str:
+    #     return f'Hello, I am {self.name} and I am {self.age} y.o.'
         
     # Providing a fallback for property lookup, is always run after __getattribute__ if both are present!
     def __getattr__(self, name):
@@ -95,15 +130,20 @@ class Pet:
         print('Inside __getattribute__')
         return object.__getattribute__(self, name)
 
+    def print_pet_details(self):
+        print(f'''
+            name:{self.name}
+            age:{self.age}
+            breed:{self.breed}
+            temperament:{self.temperament}
+            owner:{self.owner}
+        ''')
+
+fido = Pet(name="Fido", xyz="xyz", age=2, breed="pug", temperament="docile", owner="Matteo")
+milo = Pet(name="Milo", xyz="xyz", age=2, breed="pug", temperament="docile", owner="Matteo")
+print('done')
 # ✅. Create a class method increase_pets that will increment total_pets
 
     # Instance Method
-    # def print_pet_details(self):
-    #     print(f'''
-    #         name:{self.name}
-    #         age:{self.age}
-    #         breed:{self.breed}
-    #         temperament:{self.temperament}
-    #     ''')
 
     # Class Method
