@@ -43,7 +43,8 @@ class Pet:
     
     def get_age(self):
         print("Inside the age property getter")
-        return self._age  #=> self.__getattribute__(age)
+        return self._age
+    
     def set_age(self, new_age):
         print("Inside the age property setter")
         if type(new_age) is int and new_age > 0:
@@ -56,6 +57,7 @@ class Pet:
     def get_owner(self):
         print("Inside the owner property getter")
         raise AttributeError('Privacy concern, you cannot see me!')
+    
     def set_owner(self, new_owner):
         print("Inside the owner property setter")
         if type(new_owner) is str and len(new_owner) > 2:
