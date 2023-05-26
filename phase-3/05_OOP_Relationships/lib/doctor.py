@@ -10,7 +10,7 @@ class Doctor:
         type(self).all.append(self)
 
     def appointments(self):
-        pass
+        return [appt for appt in Appointment.all if appt.doctor == self]
 
     def patients(self):
-        pass
+        return {appointment.patient for appointment in self.appointments()}
