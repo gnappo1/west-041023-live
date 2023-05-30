@@ -62,10 +62,10 @@ At the end of the phase, we'll be building out an API that will sit between our 
 ### Key Features:
 
 - Add persistence
-  - A Read (SELECT) operation to retrieve persisted pets
-  - A Create (INSERT INTO) operation to persist new pets
-  - An Update (UPDATE) operation to update a persisted pet
-  - An Delete (DELETE) operation to delete a persisted pet
+  - A Read (SELECT) operation to retrieve persisted dogs
+  - A Create (INSERT INTO) operation to persist new dogs
+  - An Update (UPDATE) operation to update a persisted dog
+  - An Delete (DELETE) operation to delete a persisted dog
 
 <!-- slide -->
 
@@ -76,15 +76,11 @@ The following slides outline the configuration changes necessary to integrate a 
 
 ## DB Config
 
-### Add sqlite3 gem to Gemfile
+1. Install sqlite3 locally
 
-```bash
-bundle add sqlite3
-```
+2. Install [DB Browser for SQLite](https://sqlitebrowser.org/)
 
-Install [DB Browser for SQLite](https://sqlitebrowser.org/)
-
-WSL [Using SQLite with VS Code Extension](https://www.youtube.com/watch?v=bKixKfb1J1o)
+3. WSL [Using SQLite with VS Code Extension](https://www.youtube.com/watch?v=bKixKfb1J1o)
   - Right click DB and select "Open database"
   - In SQLite Explorer, right click the Database and select "New query"
   - Write the query, highlight the query, click right and select "Run query"
@@ -104,7 +100,7 @@ A relational database is a database of tables and rows with data points that rel
 #### Delete Tables
 DROP TABLE owners;
 
-#### Create the Tables for pets and owners 
+#### Create the Tables for dogs and owners 
 
 ```
 CREATE TABLE owners(
@@ -116,7 +112,7 @@ CREATE TABLE owners(
 );
 
 
-CREATE TABLE pets(
+CREATE TABLE dogs(
   id INTEGER PRIMARY KEY,
   owner_id INTEGER,
   name TEXT,
@@ -133,10 +129,10 @@ CREATE TABLE pets(
 ### Update Table
 
 ```
-ALTER TABLE pets
+ALTER TABLE dogs
 ADD COLUMN image_url TEXT;
 
-ALTER TABLE pets
+ALTER TABLE dogs
 RENAME COLUMN birthdate TO age;
 
 ```
@@ -150,17 +146,17 @@ INSERT INTO owners(name, address, email, phone)
 VALUES ('Adam', '000 dr sw San Francisco CA 90000', 'cyberpunk999@gmail.com', '0001239999');
 
 
-INSERT INTO pets(name, age, breed, favorite_treats, image_url, owner_id) 
+INSERT INTO dogs(name, age, breed, favorite_treats, image_url, owner_id) 
 VALUES ('Luke', '2', 'domestic longhair', 'bacon', 'https://res.cloudinary.com/dnocv6uwb/image/upload/v1631229064/zx6CPsp_d_utkmww.webp', 2);
 
-INSERT INTO pets(name, age, breed, favorite_treats, image_url, owner_id) 
+INSERT INTO dogs(name, age, breed, favorite_treats, image_url, owner_id) 
 VALUES ('rose', '11', 'domestic longhair', 'house plants', 'https://res.cloudinary.com/dnocv6uwb/image/upload/v1631229038/EEE90-E50-25-F0-4-DF0-98-B2-0-E0-B6-F9-BAA89_menwgg.jpg', 1);
 
 
-INSERT INTO pets(name, age, breed, favorite_treats, image_url, owner_id) 
+INSERT INTO dogs(name, age, breed, favorite_treats, image_url, owner_id) 
 VALUES ('leia', '2', 'domestic Shorthair', 'bacon', 'https://res.cloudinary.com/dnocv6uwb/image/upload/v1631229011/8136c615d670e214f80de4e7fcdf8607--cattle-dogs-mans_vgyqqa.jpg', 2);
 
-INSERT INTO pets(name, age, breed, favorite_treats, image_url, owner_id) 
+INSERT INTO dogs(name, age, breed, favorite_treats, image_url, owner_id) 
 VALUES ('Chop', '5', 'shiba inu', 'cheese', 'https://res.cloudinary.com/dnocv6uwb/image/upload/v1629822267/cdbd77592e3ef91e8cc1cf67d936f94f_fkozjt.jpg', 1);
 
 ```
@@ -168,26 +164,26 @@ VALUES ('Chop', '5', 'shiba inu', 'cheese', 'https://res.cloudinary.com/dnocv6uw
 ### Query Table Data
 
 ```
-SELECT * FROM pets
+SELECT * FROM dogs
 
-SELECT * FROM pets 
+SELECT * FROM dogs 
 WHERE name = 'rose';
 
-SELECT * FROM pets 
+SELECT * FROM dogs 
 WHERE favorite_treats = 'bacon';
 
-SELECT * FROM pets
+SELECT * FROM dogs
 WHERE age < 5;
 
-UPDATE pets
+UPDATE dogs
 SET age = 12
 WHERE name = 'rose';
 
-UPDATE pets
+UPDATE dogs
 SET favorite_treats = 'cheese'
 
 
-DELETE FROM pets WHERE name = 'Chop';
+DELETE FROM dogs WHERE name = 'Chop';
 
 ```
 
@@ -196,9 +192,9 @@ DELETE FROM pets WHERE name = 'Chop';
 #### one-to-many
 
 ```
-SELECT pets.name, owners.name as 'owner'
-FROM pets
-JOIN owners ON pets.owner_id = owners.id;
+SELECT dogs.name, owners.name as 'owner'
+FROM dogs
+JOIN owners ON dogs.owner_id = owners.id;
 ```
 
 #### many-to-many
@@ -220,7 +216,7 @@ CREATE TABLE appointments(
   pet_id INTEGER,
   handler_id INTEGER,
   FOREIGN KEY (handler_id) REFERENCES handlers(id),
-  FOREIGN KEY (pet_id) REFERENCES pets(id)
+  FOREIGN KEY (pet_id) REFERENCES dogs(id)
 );
 
 
@@ -247,26 +243,26 @@ VALUES ('2022-05-21 00:00:00', 'walk', 2,2);
 
 
 SELECT
-  pets.name,
+  dogs.name,
   handlers.name,
   appointments.request,
   appointments.time
 FROM appointments
-JOIN pets
-  ON appointments.pet_id = pets.id
+JOIN dogs
+  ON appointments.pet_id = dogs.id
 JOIN handlers
   ON appointments.handler_id = handlers.id;
 
 
 SELECT DISTINCT
-  pets.name,
+  dogs.name,
   handlers.name
 FROM appointments
-JOIN pets
-  ON appointments.pet_id = pets.id
+JOIN dogs
+  ON appointments.pet_id = dogs.id
 JOIN handlers
   ON appointments.handler_id = handlers.id
-AND pets.name = 'Luke';
+AND dogs.name = 'Luke';
 
 
 
