@@ -17,7 +17,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, validates
 from sqlalchemy.ext.associationproxy import association_proxy
 
 metadata = MetaData(
@@ -30,7 +30,7 @@ metadata = MetaData(
     }
 )
 Base = declarative_base(metadata=metadata)
-
+from sqlalchemy import event
 
 class Pet(Base):
     __tablename__ = "pets"
@@ -43,6 +43,9 @@ class Pet(Base):
     species = Column(String)
     owner_id = Column(Integer, ForeignKey("owners.id"))
     owner = relationship("Owner", back_populates="pets")
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+    
     jobs = relationship("Job", back_populates="pet", cascade="all, delete-orphan")
     handlers = association_proxy(
         "jobs", "handler", creator=lambda handler: Job(handler=handler)
@@ -67,9 +70,18 @@ class Owner(Base):
     email = Column(String, unique=True)
     phone = Column(Integer, unique=True)
     address = Column(String)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     pets = relationship("Pet", back_populates="owner", cascade="all, delete-orphan")
     # pets = relationship("Pet", backref=backref('owner'), cascade="all, delete-orphan")
-
+    
+    @validates('phone')
+    def validate_phone(self, key, phone):
+        pattern = r'^\d{10}$'
+        if not re.match(pattern, str(phone)):
+            raise ValueError('Number must be 10 digits with no spaces or dashes')
+        return phone
+    
     def __repr__(self):
         return (
             f"<Owner #{self.id} \n"
@@ -91,6 +103,8 @@ class Handler(Base):
     email = Column(String, unique=True)
     phone = Column(Integer, unique=True)
     hourly_rate = Column(Float, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
     jobs = relationship("Job", back_populates="handler", cascade="all, delete-orphan")
     pets = association_proxy(
         "jobs", "pet", creator=lambda pet: Job(pet=pet)
@@ -108,17 +122,27 @@ class Handler(Base):
 
 class Job(Base):
     __tablename__ = "jobs"
-
-    id = Column(Integer, primary_key=True)
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="job_pk"),
+        CheckConstraint('length(notes) > 0', name='notes_length_check'),
+        CheckConstraint('fee >= 12.0 and fee <= 50.0', name='fee_check'),
+        CheckConstraint('request IN (\'Walk\', \'Drop-In\', \'Boarding\')', name='request_check'),
+        CheckConstraint(text('date > CURRENT_TIMESTAMP'), name='future_date_check')
+    )
+    
+    id = Column(Integer)
     notes = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
     request = Column(String, nullable=False)
     fee = Column(Float, nullable=False)
     handler_id = Column(Integer, ForeignKey("handlers.id"))
     pet_id = Column(Integer, ForeignKey("pets.id"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+    
     pet = relationship("Pet", back_populates="jobs")
     handler = relationship("Handler", back_populates="jobs")
-
+    
     def __repr__(self):
         return (
             f"<Job #{self.id} \n"

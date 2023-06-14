@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from models import Pet, Owner, Job, Handler
-
+from datetime import date, timedelta
 if __name__ == '__main__':
     engine = create_engine('sqlite:///pet_walker.db')
     Session = sessionmaker(bind=engine)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
             name=f"{fake.first_name()} {fake.last_name()}",
             email=fake.email(),
             phone=random.randint(1000000000, 9999999999),
-            hourly_rate=random.uniform(25.50, 80.50)
+            hourly_rate=random.uniform(25.50, 50.0)
         )
     
         # Use .add and .commit to save the handler to the database
@@ -124,7 +124,7 @@ if __name__ == '__main__':
             # Create a Job using faker, the requests List and pets List
             job = Job(
                 request=random.choice(requests),
-                date=fake.date_this_year(),
+                date= date.today() + timedelta(days=1),
                 notes=fake.sentence(),
                 fee=handler.hourly_rate,
                 handler_id = handler.id,
