@@ -1,8 +1,8 @@
-"""create Production and CrewMember
+"""create models Production and CrewMember
 
-Revision ID: 6795be14a8f8
+Revision ID: 7ec5d98bd45c
 Revises: 
-Create Date: 2023-06-13 21:06:34.443211
+Create Date: 2023-06-14 12:19:05.759245
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6795be14a8f8'
+revision = '7ec5d98bd45c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,12 +21,12 @@ def upgrade():
     op.create_table('productions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
-    sa.Column('genre', sa.String(), nullable=True),
-    sa.Column('director', sa.String(), nullable=True),
-    sa.Column('description', sa.String(), nullable=True),
-    sa.Column('budget', sa.Float(), nullable=True),
-    sa.Column('image', sa.String(), nullable=True),
-    sa.Column('ongoing', sa.Boolean(), nullable=True),
+    sa.Column('genre', sa.String(), nullable=False),
+    sa.Column('director', sa.String(), nullable=False),
+    sa.Column('description', sa.String(), nullable=False),
+    sa.Column('budget', sa.Float(), nullable=False),
+    sa.Column('image', sa.String(), nullable=False),
+    sa.Column('ongoing', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
