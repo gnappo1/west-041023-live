@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 # 📚 Review With Students:
-    # API Fundamentals
-    # MVC Architecture and Patterns / Best Practices
-    # RESTful Routing
-    # Serialization
-    # Postman
+# API Fundamentals
+# MVC Architecture and Patterns / Best Practices
+# RESTful Routing
+# Serialization
+# Postman
 
-# Set Up:
-    # In Terminal, `cd` into `server` and run the following:
-        # export FLASK_APP=app.py
-        # export FLASK_RUN_PORT=5000
-        # flask db init
-        # flask db revision --autogenerate -m 'Create tables' 
-        # flask db upgrade 
-        # python seed.py
+# Set Up When starting from scratch:
+# In Terminal, `cd` into `server` and run the following:
+# export FLASK_APP=app.py
+# export FLASK_RUN_PORT=5000
+# flask db init
+# flask db revision --autogenerate -m 'Create tables'
+# flask db upgrade
+# python seed.py
 
 # Restful
 
@@ -25,7 +25,6 @@
 # | POST      	|   /productions   	| CREATE one resource 	|
 # | PATCH/PUT 	| /productions/:id 	| UPDATE one resource	|
 # | DELETE    	| /productions/:id 	| DESTROY one resource 	|
-
 
 
 from flask import (
@@ -39,16 +38,19 @@ from flask import (
     make_response,
     url_for,
     redirect,
-    abort
+    abort,
 )
-from werkzeug.exceptions import HTTPException, BadRequest, UnprocessableEntity, InternalServerError
+
 from flask_migrate import Migrate
 from models import db, Production, CrewMember
 from time import time
-# 1. ✅ Import `Api` and `Resource` from `flask_restful`
-    # ❓ What do these two classes do at a higher level?
 from flask_restful import Api, Resource, reqparse
-
+from werkzeug.exceptions import (
+    HTTPException,
+    BadRequest,
+    UnprocessableEntity,
+    InternalServerError,
+)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///theater.db"
@@ -61,103 +63,91 @@ db.init_app(app)
 api = Api(app)
 
 parser = reqparse.RequestParser()
-parser.add_argument('title', type=str, required=True, help='Title field is required.')
-parser.add_argument('genre', type=str, required=True, help='Genre field is required.')
-parser.add_argument('director', type=str, required=True, help='Director field is required.')
-parser.add_argument('description', type=str, required=True, help='Description field is required.')
-parser.add_argument('budget', type=float, required=True, help='Budget field is required.')
-parser.add_argument('image', type=str, required=True, help='Image field is required.')
-parser.add_argument('ongoing', type=bool, required=True, help='Ongoing field is required.')
+parser.add_argument("title", type=str, required=True, help="Title must be present")
+parser.add_argument("genre", type=str, required=True, help="genre must be present")
+parser.add_argument(
+    "description", type=str, required=True, help="description must be present"
+)
+parser.add_argument(
+    "director", type=str, required=True, help="director must be present"
+)
+parser.add_argument("budget", type=float, required=True, help="budget must be present")
+parser.add_argument("image", type=str, required=True, help="image must be present")
+parser.add_argument("ongoing", type=bool, required=True, help="ongoing must be present")
 
-# Error handling for 400 Bad Request
-@app.errorhandler(BadRequest)
+
+@app.errorhandler(BadRequest)  # 400
 def handle_bad_request(error):
-    response = jsonify({'message': 'Bad Request'})
+    response = jsonify({"message": "Bad Request"})
     response.status_code = error.code
     return response
 
-# Error handling for 422 Unprocessable Entity
-@app.errorhandler(UnprocessableEntity)
-def handle_unprocessable_entity(error):
-    response = jsonify({'message': 'Unprocessable Entity'})
+
+@app.errorhandler(UnprocessableEntity)  # 422
+def handle_bad_request(error):
+    response = jsonify({"message": "Unprocessible Entity, something looked fishy!"})
     response.status_code = error.code
     return response
 
-# Error handling for 500 Internal Server Error
-@app.errorhandler(InternalServerError)
-def handle_internal_server_error(error):
-    response = jsonify({'message': 'Internal Server Error'})
+
+@app.errorhandler(InternalServerError)  # 500
+def handle_bad_request(error):
+    response = jsonify({"message": "Internal Server Error"})
     response.status_code = error.code
     return response
 
-# Error handling for all other HTTP exceptions
-@app.errorhandler(HTTPException)
-def handle_http_exception(error):
-    response = jsonify({'message': error.description})
+
+@app.errorhandler(HTTPException)  # for any other errors
+def handle_bad_request(error):
+    response = jsonify({"message": error.description})
     response.status_code = error.code
     return response
+
 
 @app.route("/")
 def welcome():
     return "<h1>Welcome to our Theater!</h1>"
 
-# 3. ✅ Create a Production class that inherits from Resource
-
-# 4. ✅ Create a GET (All) Route
 
 class Productions(Resource):
     def get(self):
-        #check out self and explore attributes/properties like: methods, endpoint, ...
-        productions = [p.to_dict() for p in Production.query.all()]
-        return make_response(productions, 200)
-        
+        # check out self and explore attributes/properties like: methods, endpoint, ...
+        prods = [prod.to_dict() for prod in Production.query.all()]
+        return make_response(prods, 200)
+
     def post(self):
         # inspect the request object
         # useful methods 'args', 'headers', 'cookies', 'data', get_json(), get_data(), json(), 'method', 'mimetype','path', 'url',
-        
-        args = parser.parse_args()
-        # Access the parsed and validated data
-        title = args['title']
-        genre = args['genre']
-        director = args['director']
-        description = args['description']
-        budget = args['budget']
-        image = args['image']
-        ongoing = args['ongoing']
-        
-        # Perform validations
-        self.validate_title(title)
-        self.validate_description(description)
-        
-        import ipdb; ipdb.set_trace()
+        # data = request.get_json()
+        data = parser.parse_args()
+        # perform extra validations!!!
+        self.validate_title(data["title"])
+
         try:
-            prod = Production(title=title, genre=genre, director=director, budget=budget, image=image, ongoing=ongoing, description=description)
+            prod = Production(**data)
             db.session.add(prod)
             db.session.commit()
-            return prod.as_dict(), 201
-        
-        except Exception as e:
+            return make_response(prod.to_dict(), 201)
+        except:
             db.session.rollback()
-            abort(422, "You somehow bypassed by most immediate defenses")
-            
-    def validate_title(self, title):
-        if len(title) > 3:
-            raise BadRequest('title must be at least 3 characters long.')
+            abort(400, "There was a problem with the values provided!")
 
-    def validate_description(self, description):
-        if len(description) > 100:
-            raise BadRequest('Description must be at least 100 characters long.')
-        
-api.add_resource(Productions, '/productions')
+    def validate_title(self, title):
+        if len(title) < 3:
+            raise BadRequest("title must be longer than 3 characters!!!")
+
+
+api.add_resource(Productions, "/productions")
+
 
 class ProductionByID(Resource):
     def get(self, id):
-        prod = db.session.get(Production, id)
-        
-        if not prod:
-            abort(404, "The Production you are looking for does not exist!")
-        
-        return make_response(prod.as_dict(), 200)
+        if prod := Production.query.get(id):
+            # return make_response(prod, 200)
+            return make_response(prod.to_dict(), 200)
+        else:
+            abort(404, f"Could not find Production with id {id}")
+
 
 api.add_resource(ProductionByID, "/productions/<int:id>")
 

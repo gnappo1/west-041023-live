@@ -12,6 +12,7 @@
 - Demonstrate How to Use Serializers to Render Structured Data in API - 
 
 ## Responses
+
 - Lecture Topics
 - Introduction to APIs
 - Command Line Flask
@@ -22,3 +23,8 @@
 - SQLAlchemy-Serializer
 - Serializing Relationships
 - Serializing Associations
+
+## BONUS
+
+- Using app-level validations in Views with reqparse
+- Standardizing Api-level Errors with @app.errorhandler 
