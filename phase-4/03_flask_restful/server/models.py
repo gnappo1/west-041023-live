@@ -38,11 +38,13 @@ class Production(db.Model):
     def validate_title(self, key, value):
         if not value or len(value) < 3:
             raise ValueError(f'{key.title()} must be a string of at least 3 characters')
+        return value
 
     @validates('director')
     def validate_director(self, _, value):
         if not value or type(value) is not str or len(value.split(" ")) < 2:
             raise ValueError('Director must contain at least 2 words')
+        return value
         
 class CrewMember(db.Model):
     __tablename__ = "crew_members"

@@ -4,6 +4,7 @@ from flask import (
     Flask,
     request,
     g,
+    jsonify,
     make_response,
     abort,
 )
@@ -49,10 +50,10 @@ class CrewMemberSchema(ma.SQLAlchemySchema):
         model = CrewMember # name of model
         load_instance = True
         ordered = True
-        fields = ('id', 'name', 'role', 'production_id', 'production')
+        fields = ('id', 'name', 'role', 'production_id', 'production', 'url')
     
     name = fields.String(required=True)
-    production = fields.Nested('ProductionSchema', only=('title', ), exclude=('crew_members', ))
+    production = fields.Nested('ProductionSchema', exclude=('crew_members', ))
     role = fields.String(required=True, validate=validate.Length(min=3, max=50, error="Role should be a string at least 3 chars long! But max 50!"))
     url = ma.Hyperlinks(
         {
@@ -77,20 +78,29 @@ class ProductionSchema(ma.SQLAlchemySchema):
         model = Production # name of model
         load_instance = True
         ordered = True
-        fields = ('id', 'title', 'genre', 'budget', 'description', 'director', 'image', 'ongoing', 'crew_members')
+        fields = ('id', 'title', 'genre', 'budget', 'description', 'director', 'image', 'ongoing', 'crew_members', 'url')
 
     title = fields.String(required=True)
     genre = fields.String(required=True)
     crew_members = fields.Nested(CrewMemberSchema, only=('id', 'role'), exclude=('production',), many=True)
-
+    url = ma.Hyperlinks(
+        {
+            "self": ma.URLFor(
+                'productionbyid',
+                values=dict(id="<id>")
+            ),
+            "collection": ma.URLFor('productions'),
+            "crewmembers": ma.URLFor('crewmembers')
+        }
+    )
 production_schema = ProductionSchema()
-productions_schema = ProductionSchema(many=True)
+productions_schema = ProductionSchema(many=True, exclude=('crew_members', ))
 
-@app.errorhandler(BadRequest)  # 400
-def handle_bad_request(error):
-    response = jsonify({"message": "Bad Request"})
-    response.status_code = error.code
-    return response
+# @app.errorhandler(BadRequest)  # 400
+# def handle_bad_request(error):
+#     response = jsonify({"message": "Bad Request"})
+#     response.status_code = error.code
+#     return response
 
 
 @app.errorhandler(UnprocessableEntity)  # 422
@@ -107,21 +117,25 @@ def handle_bad_request(error):
     return response
 
 
-@app.errorhandler(HTTPException)  # for any other errors
-def handle_bad_request(error):
-    response = jsonify({"message": error.description})
-    response.status_code = error.code
-    return response
+# @app.errorhandler(HTTPException)  # for any other errors
+# def handle_bad_request(error):
+#     response = jsonify({"message": error.description})
+#     response.status_code = error.code
+#     return response
 
 @app.before_request
 def find_prod_by_id():
     if request.endpoint == 'productionbyid':
         id_ = request.view_args.get('id')
         if prod := Production.query.get(id_):
-            g.prod = prod
+            g.prod = production_schema.dump(prod)
         else:
             abort(404, f"Could not find Production with id {id_}")
-    
+
+def format_ma_errors(e):
+    errors = "".join(f"{attr.title()}: {e.get(attr)[0].lower()}" for attr in e)
+    abort(424, errors)
+
 @app.route("/")
 def welcome():
     return "<h1>Welcome to our Theater!</h1>"
@@ -129,25 +143,21 @@ def welcome():
 class Productions(Resource):
     def get(self):
         # check out self and explore attributes/properties like: methods, endpoint, ...
-        prods = [prod.to_dict() for prod in Production.query.all()]
+        prods = productions_schema.dump(Production.query.all())
         return make_response(prods, 200)
 
     def post(self):
         try:
-            data = self.parser.parse_args()
-            # perform extra validations!!!
-            self.validate_title(data["title"])
-            prod = Production(**data)
+            if errors := production_schema.validate(request.get_json()):
+                format_ma_errors(errors)
+            prod = production_schema.load(request.get_json())
             db.session.add(prod)
             db.session.commit()
-            return make_response(prod.to_dict(), 201)
-        except:
+            serialized_product = production_schema.dump(prod)
+            return make_response(serialized_product, 201)
+        except Exception as e:
             db.session.rollback()
-            abort(400, "There was a problem with the values provided!")
-
-    def validate_title(self, title):
-        if len(title) < 3:
-            raise BadRequest("title must be longer than 3 characters!!!")
+            abort(400, str(e))
 
 api.add_resource(Productions, "/productions")
 
@@ -155,7 +165,7 @@ api.add_resource(Productions, "/productions")
 class ProductionByID(Resource):
 
     def get(self, id):
-        return make_response(g.get('prod').to_dict(), 200) if g.get('prod') else abort(404, "DO we even get here???")
+        return make_response(g.get('prod'), 200) if g.get('prod') else abort(404, "DO we even get here???")
             
     def patch(self, id):
         try:
