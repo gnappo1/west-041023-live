@@ -116,14 +116,10 @@ class Productions(Resource):
         return make_response(prods, 200)
 
     def post(self):
-        # inspect the request object
-        # useful methods 'args', 'headers', 'cookies', 'data', get_json(), get_data(), json(), 'method', 'mimetype','path', 'url',
-        # data = request.get_json()
-        data = parser.parse_args()
-        # perform extra validations!!!
-        self.validate_title(data["title"])
-
         try:
+            data = parser.parse_args()
+            # perform extra validations!!!
+            self.validate_title(data["title"])
             prod = Production(**data)
             db.session.add(prod)
             db.session.commit()
@@ -151,5 +147,33 @@ class ProductionByID(Resource):
 
 api.add_resource(ProductionByID, "/productions/<int:id>")
 
+
+class CrewMembers(Resource, ParserMixin):
+    def get(self):
+        crew = [cm.to_dict() for cm in CrewMember.query.all()]
+        return make_response(crew, 200)
+
+    def post(self):
+        try:
+            data = parser.parse_args()
+            cm = CrewMember(**data)
+            db.session.add(cm)
+            db.session.commit()
+            return make_response(cm.to_dict(), 201)
+        except Exception as e:
+            handle_model_errors(e)
+                
+api.add_resource(CrewMembers, "/crewmembers")
+
+class CrewMemberByID(Resource):
+    def get(self, id):
+        if crew:= CrewMember.query.get(id):
+            # return make_response(crew, 200)
+            return make_response(crew.to_dict(), 200)
+        else:
+            abort(404, f"Could not find CrewMember with id {id}")
+
+
+api.add_resource(CrewMemberByID, "/crewmembers/<int:id>")
 if __name__ == "__main__":
     app.run(debug=True, port=5555)
