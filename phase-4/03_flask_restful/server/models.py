@@ -1,10 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
 
-class Production(db.Model, SerializerMixin):
+class Production(db.Model):
     __tablename__ = "productions"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,12 +17,10 @@ class Production(db.Model, SerializerMixin):
     ongoing = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+    #&* Relationships
     crew_members = db.relationship(
         "CrewMember", back_populates="production", cascade="all"
     )
-
-    # serialize_only = ("id", "title", "crew_members") #recursive stack level too deep
-    serialize_rules = ("-crew_members.production", "-created_at", "-updated_at")
 
     def __repr__(self):
         return (
@@ -36,20 +34,17 @@ class Production(db.Model, SerializerMixin):
             + f"Description: {self.description}"
         )
 
-    def as_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "genre": self.genre,
-            "director": self.director,
-            "budget": self.budget,
-            "image": self.image,
-            "ongoing": self.ongoing,
-            "description": self.description,
-        }
+    @validates('title', 'genre')
+    def validate_title(self, key, value):
+        if not value or len(value) < 3:
+            raise ValueError(f'{key.title()} must be a string of at least 3 characters')
 
-
-class CrewMember(db.Model, SerializerMixin):
+    @validates('director')
+    def validate_director(self, _, value):
+        if not value or type(value) is not str or len(value.split(" ")) < 2:
+            raise ValueError('Director must contain at least 2 words')
+        
+class CrewMember(db.Model):
     __tablename__ = "crew_members"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -61,20 +56,10 @@ class CrewMember(db.Model, SerializerMixin):
 
     production = db.relationship("Production", back_populates="crew_members")
 
-    serialize_rules = ("-production.crew_members", "-created_at", "-updated_at")
-
     def __repr__(self):
         return (
-            f"<Production #{self.id}:\n"
+            f"<CrewMember #{self.id}:\n"
             + f"Name: {self.name}"
             + f"Role: {self.role}"
             + f"Production_id: {self.production_id}"
         )
-
-    def as_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "role": self.role,
-            "production_id": self.production_id,
-        }
