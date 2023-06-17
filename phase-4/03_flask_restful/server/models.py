@@ -1,9 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
-
+import re
 db = SQLAlchemy()
-
-
 class Production(db.Model):
     __tablename__ = "productions"
 
@@ -34,17 +32,47 @@ class Production(db.Model):
             + f"Description: {self.description}"
         )
 
-    @validates('title', 'genre')
-    def validate_title(self, key, value):
-        if not value or len(value) < 3:
-            raise ValueError(f'{key.title()} must be a string of at least 3 characters')
-        return value
+    @validates('title')
+    def validate_title(self, key, title):
+        if type(title) is not str or len(title) < 3:
+            raise ValueError(f'{title} has to be at least 3 characters long')
+        return title
 
+    @validates('genre') #presence and inclusion
+    def validate_genre(self, key, genre):
+        if type(genre) is not str or genre not in ['Drama', 'Musical', 'Opera']:
+            raise ValueError(f'{genre} has to be one of Drama, Musical, Opera')
+        return genre
+    
     @validates('director')
-    def validate_director(self, _, value):
-        if not value or type(value) is not str or len(value.split(" ")) < 2:
-            raise ValueError('Director must contain at least 2 words')
-        return value
+    def validate_director(self, key, director):
+        if type(director) is not str or len(director.split(' ')) < 2:
+            raise ValueError(f'{director} has to be a string of at least two words')
+        return director
+    
+    @validates('description')
+    def validate_description(self, key, description):
+        if type(description) is not str or len(description) < 10:
+            raise ValueError(f'{description} has to be a string of at least 10 characters')
+        return description
+    
+    @validates('budget')
+    def validate_budget(self, key, budget):
+        if type(budget) is not float or budget < 0 or budget > 10000000:
+            raise ValueError(f'{budget} has to be a positive float under 1Million')
+        return budget
+    
+    @validates('image')
+    def validate_image(self, key, image):
+        if type(image) is not str or not re.match(r'^https?:\/\/.*\.(?:png|jpeg)$', image):
+            raise ValueError(f'{image} has to be a string of a valid url ending in png or jpg')
+        return image
+    
+    @validates('ongoing')
+    def validate_ongoing(self, key, ongoing):
+        if type(ongoing) is not bool:
+            raise ValueError(f'{ongoing} has to be a boolean')
+        return ongoing
         
 class CrewMember(db.Model):
     __tablename__ = "crew_members"
@@ -65,3 +93,21 @@ class CrewMember(db.Model):
             + f"Role: {self.role}"
             + f"Production_id: {self.production_id}"
         )
+    
+    @validates('name')
+    def validate_name(self, key, name):
+        if type(name) is not str or len(name.split(' ')) < 2:
+            raise ValueError(f'{name} has to be at least 2 words')
+        return name
+    
+    @validates('role')
+    def validate_role(self, key, role):
+        if type(role) is not str or len(role) < 2:
+            raise ValueError(f'{role} has to be at least 3 characters long')
+        return role
+    
+    @validates('production_id')
+    def validate_production_id(self, key, production_id):
+        if not production_id or type(production_id) is not int or production_id < 1 or not Production.query.get(production_id):
+            raise ValueError(f'{production_id} has to be a positive integer corresponding to an existing production')
+        return production_id
