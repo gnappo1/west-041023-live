@@ -14,7 +14,7 @@ from models.production import Production
 from models.__init__ import db
 from flask_restful import Api, Resource, reqparse
 from flask_marshmallow import Marshmallow
-from marshmallow import fields, validates, validate, ValidationError
+from marshmallow import ValidationError
 from werkzeug.exceptions import (
     HTTPException,
     BadRequest,
@@ -41,94 +41,14 @@ ma = Marshmallow(app)
 #* Flask-RESTful
 api = Api(app)
 
-#* Example of using reqparse for app-level validations
-#* And encapsulated the code into a Mixin to extend other classes functionality
-class ParserMixin:
-    def __init__(self):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument("title", type=str, required=True, help="Title must be present")
-        self.parser.add_argument("genre", type=str, required=True, help="genre must be present")
-        self.parser.add_argument(
-            "description", type=str, required=True, help="description must be present"
-        )
-        self.parser.add_argument(
-            "director", type=str, required=True, help="director must be present"
-        )
-        self.parser.add_argument("budget", type=float, required=True, help="budget must be present")
-        self.parser.add_argument("image", type=str, required=True, help="image must be present")
-        self.parser.add_argument("ongoing", type=bool, required=True, help="ongoing must be present")
-
-class CrewMemberSchema(ma.SQLAlchemySchema):
-    class Meta():
-        # name of model
-        model = CrewMember
-        # avoid recreating objects on updates, only applies to deserialization (load())
-        # in order for this to work, flask-marshmallow (is specific to this wrapper)
-        # needs to know how an instance even looks like, note how we invoked load() on line 222
-        load_instance = True
-        #  if you set to True, Marshmallow will preserve the order of fields as defined in the schema.
-        ordered = True
-        # Specify which fields to serialize (not deserialize)
-        fields = ('id', 'name', 'role', 'production_id', 'production', 'url')
-    
-    #! Setup some app-level (aka no DB involved) validations
-    #* See more here https://marshmallow.readthedocs.io/en/stable/marshmallow.validate.html#module-marshmallow.validate
-    name = fields.String(required=True)
-    production = fields.Nested('ProductionSchema', exclude=('crew_members', ))
-    role = fields.String(required=True, validate=validate.Length(min=3, max=50, error="Role should be a string at least 3 chars long! But max 50!"))
-    
-    #! Create hyperlinks for easy navigation of your api
-    url = ma.Hyperlinks(
-        {
-            "self": ma.URLFor(
-                'crewmemberbyid',
-                values=dict(id="<id>")
-            ),
-            "collection": ma.URLFor('crewmembers')
-        }
-    )
-    
-    #! Example of custom validation with marshmallow 
-    #! (DANGER -> VERY similar to the syntax in the models)
-    @validates('name')
-    def validate_word_count(self, name):
-        words = name.split()
-        if len(words) < 2:
-            raise ValidationError('Text must contain at least two words')
-
+#! Marshmallow Schemas
+from schemas.crew_member_schema import CrewMemberSchema
+from schemas.production_schema import ProductionSchema
 #! Create schema for a single crew_member
 crew_member_schema = CrewMemberSchema()
 #! Create schema for a collection of crew_members
 #* Feel free to use only and exclude to customize
 crew_members_schema = CrewMemberSchema(many=True)
-
-class ProductionSchema(ma.SQLAlchemySchema):
-    #! The notes are the same as above in CrewMemberSchema ^^^
-    class Meta():
-        model = Production
-        load_instance = True
-        fields = ('title', 'genre', 'budget', 'director', 'description', 'id', 'image', 'ongoing', 'crew_members', 'url')
-
-    crew_members = fields.Nested(CrewMemberSchema, only=('id', 'name', 'role'), exclude=('production',), many=True)
-    title = fields.String(required=True, validate=validate.Length(min=2, max=50))
-    director = fields.String(required=True, validate=validate.Length(min=2, max=50))
-    description = fields.String(required=True, validate=validate.Length(min=30, max=500))
-    genre = fields.String(required=True, validate=validate.Length(min=2, max=50))
-    image = fields.String(required=True, validate=validate.Regexp(r'.*\.(jpeg|png)', error="File URI must be in JPEG or PNG format"))
-    budget = fields.Float(required=True, validate=validate.Range(min=0.99, max=500000000))
-
-    url = ma.Hyperlinks(
-        {
-            "self": ma.URLFor(
-                "productionbyid",
-                values=dict(id="<id>")),
-            "collection": ma.URLFor("productions"),
-            "crewmembers": ma.URLFor(
-                "crewmembers"
-            )
-        }
-    )
-    
 #! Create schema for a single crew_member
 production_schema = ProductionSchema()
 #! Create schema for a collection of crew_members
