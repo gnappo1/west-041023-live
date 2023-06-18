@@ -11,6 +11,8 @@ sqlalchemy-serializer = "*"
 jsonify = "*"
 importlib-resources = "*"
 flask-restful = "*"
+flask-marshmallow = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 ipdb = "*"

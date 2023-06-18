@@ -37,23 +37,23 @@ function App() {
     <>
     <GlobalStyle />
     <Navigation handleEdit={handleEdit}/>
-      <Switch>
-        <Route  path='/productions/new'>
-          <ProductionForm addProduction={addProduction}/>
-        </Route>
-        <Route  path='/productions/edit/:id'>
-          <ProductionEdit updateProduction={updateProduction} production_edit={production_edit}/>
-        </Route>
-        <Route path='/productions/:id'>
-            <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} />
-        </Route>
-        <Route exact path='/'>
-          <Home  productions={productions} />
-        </Route>
-        <Route>
-          <NotFound />
-        </Route>
-      </Switch>
+    <Switch>
+      <Route  path='/productions/new'>
+        <ProductionForm addProduction={addProduction}/>
+      </Route>
+      <Route  path='/productions/edit/:id'>
+        <ProductionEdit updateProduction={updateProduction} production_edit={production_edit}/>
+      </Route>
+      <Route path='/productions/:id'>
+          <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} />
+      </Route>
+      <Route exact path='/'>
+        <Home  productions={productions} />
+      </Route>
+      <Route>
+        <NotFound />
+      </Route>
+    </Switch>
     </>
   )
 }
