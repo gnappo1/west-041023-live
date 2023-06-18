@@ -9,7 +9,9 @@ from flask import (
     abort,
 )
 from flask_migrate import Migrate
-from models import db, Production, CrewMember
+from models.crew_member import CrewMember
+from models.production import Production
+from models.__init__ import db
 from flask_restful import Api, Resource, reqparse
 from flask_marshmallow import Marshmallow
 from marshmallow import fields, validates, validate, ValidationError

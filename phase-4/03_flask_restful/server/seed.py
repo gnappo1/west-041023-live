@@ -2,8 +2,9 @@
 from faker import Faker
 
 from app import app
-from models import db, Production, CrewMember
-
+from models.crew_member import CrewMember
+from models.production import Production
+from models.__init__ import db
 fake = Faker()
 
 with app.app_context():   
