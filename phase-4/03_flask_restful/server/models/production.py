@@ -1,6 +1,4 @@
-from sqlalchemy.orm import validates
-import re
-from models.__init__ import db
+from models import db, validates, re
 
 class Production(db.Model):
     __tablename__ = "productions"

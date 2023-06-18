@@ -1,8 +1,6 @@
-from schemas.__init__ import (ma, fields, validate, validates, ValidationError, Production)
+from schemas import fields, validate, ma, Production
 from schemas.crew_member_schema import CrewMemberSchema
-
 class ProductionSchema(ma.SQLAlchemySchema):
-    #! The notes are the same as above in CrewMemberSchema ^^^
     class Meta():
         model = Production
         load_instance = True
