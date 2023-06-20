@@ -15,7 +15,7 @@ class Production(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     #&* Relationships
     crew_members = db.relationship(
-        "CrewMember", back_populates="production", cascade="all"
+        "CrewMember", back_populates="production", cascade="all", lazy='joined'
     )
 
     def __repr__(self):

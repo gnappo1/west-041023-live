@@ -16,6 +16,7 @@ class Productions(Resource):
         try:
             #* Extract data out of the request
             data = request.json
+            import ipdb; ipdb.set_trace()
             with db.session.begin():
                 #* Validate the data, if problems arise you'll see ValidationError
                 production_schema.validate(data)

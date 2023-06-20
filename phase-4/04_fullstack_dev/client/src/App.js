@@ -16,7 +16,12 @@ function App() {
   const [production_edit, setProductionEdit] = useState(false)
   const history = useHistory()
   //5.✅ GET Productions
-  
+  useEffect(()=> {
+    fetch("/api/v1/productions")
+    .then(r => r.json())
+    .then(setProductions)
+    .catch(console.error)
+  }, [])
   // 6.✅ navigate to client/src/components/ProductionForm.js
 
   const addProduction = (production) => setProductions(productions => [...productions,production])
@@ -29,7 +34,6 @@ function App() {
       }
     }))
   )
-
   const deleteProduction = (deleted_production) => (
     setProductions(productions => (
       productions.filter((production) => production.id !== deleted_production.id) 
@@ -52,7 +56,7 @@ function App() {
         <Route  path='/productions/edit/:id'>
           <ProductionEdit updateProduction={updateProduction} production_edit={production_edit}/>
         </Route>
-        <Route path='/productions/:id'>
+        <Route path='/productions/:prodId'>
             <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} />
         </Route>
         <Route exact path='/'>
