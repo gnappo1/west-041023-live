@@ -62,7 +62,7 @@ class Production(db.Model):
     
     @validates('image')
     def validate_image(self, key, image):
-        if type(image) is not str or not re.match(r'^https?:\/\/.*\.(?:png|jpeg)$', image):
+        if type(image) is not str or not re.match(r'^https?:\/\/.*\.(?:png|jpeg|jpg)$', image):
             raise ValueError(f'{image} has to be a string of a valid url ending in png or jpg')
         return image
     

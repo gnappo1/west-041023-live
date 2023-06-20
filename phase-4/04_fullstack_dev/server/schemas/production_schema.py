@@ -11,7 +11,7 @@ class ProductionSchema(ma.SQLAlchemySchema):
     director = fields.String(required=True, validate=validate.Length(min=2, max=50))
     description = fields.String(required=True, validate=validate.Length(min=30, max=500))
     genre = fields.String(required=True, validate=validate.Length(min=2, max=50))
-    image = fields.String(required=True, validate=validate.Regexp(r'.*\.(jpeg|png)', error="File URI must be in JPEG or PNG format"))
+    image = fields.String(required=True, validate=validate.Regexp(r'.*\.(jpeg|jpg|png)', error="File URI must be in JPEG, JPG or PNG format"))
     budget = fields.Float(required=True, validate=validate.Range(min=0.99, max=500000000))
 
     url = ma.Hyperlinks(
