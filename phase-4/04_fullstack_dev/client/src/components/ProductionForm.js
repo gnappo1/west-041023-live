@@ -59,7 +59,7 @@ function ProductionForm({addProduction}) {
     },
     validationSchema: productionSchema,
     onSubmit: (values, {resetForm}) => {
-      fetch('productions', {
+      fetch('/api/v1/productions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ function ProductionForm({addProduction}) {
         if (res.ok) {
           res.json().then(data => {
             addProduction(data)
-            // resetForm({values: ''}) Not necessary if you redirect us away
+            resetForm({values: ''})
             history.push('/')
           })
         } else {
@@ -80,9 +80,7 @@ function ProductionForm({addProduction}) {
       .catch(err => console.log(err))
     }
   })
-  const resetErrors = () => { //! currently not used
-    //! In case you don't want the errors to stay under each input
-    //! and would like to remove them after some time
+  const resetErrors = () => {
     setTimeout(() => {
       // formik.setTouched({});
       formik.setErrors({});
@@ -112,7 +110,7 @@ function ProductionForm({addProduction}) {
           <label>Description</label>
           <textarea type='text' rows='4' cols='50' name='description' value={formik.values.description} onChange={formik.handleChange} />
           {formik.errors.description ? <div className="error-message show">{formik.errors.description}</div> : null}
-          <input type='submit' onClick={resetErrors} />
+          <input type='submit' />
         </Form> 
       </div>
     )
@@ -136,7 +134,4 @@ function ProductionForm({addProduction}) {
       margin-top:10px;
       margin-bottom:10px;
     }
-  `
-  const Error = styled.div`
-    color:
   `

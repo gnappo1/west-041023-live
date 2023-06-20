@@ -58,7 +58,7 @@ function ProductionFormEdit({updateProduction, production_edit}) {
     },
     validationSchema: productionSchema,
     onSubmit: (values, {resetForm}) => {
-      fetch(`productions/${id}`, {
+      fetch(`/api/v1/productions/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -78,12 +78,7 @@ function ProductionFormEdit({updateProduction, production_edit}) {
       .catch(err => console.log(err))
     }
   })
-  const resetErrors = () => {
-    setTimeout(() => {
-      // formik.setTouched({});
-      formik.setErrors({});
-    }, 6000); // Adjust the timeout duration as needed
-  };
+
   if(error) return <h2>{error}</h2>
 
     return (
