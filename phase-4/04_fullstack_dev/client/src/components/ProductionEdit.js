@@ -13,25 +13,24 @@ function ProductionFormEdit({updateProduction, production_edit}) {
     budget: yup.number().positive()
   })
 
- 
-        const formik = useFormik({
-          initialValues: {
-            title: production_edit.title,
-            genre: production_edit.genre,
-            budget: production_edit.budget,
-            image: production_edit.image,
-            director:  production_edit.director,
-            description: production_edit.description,
-          },
-          validationSchema: formSchema,
-          onSubmit: (values) => {
-           // 10.✅ Add a PATCH
-          },
-        })
+
+  const formik = useFormik({
+    initialValues: {
+      title: production_edit.title,
+      genre: production_edit.genre,
+      budget: production_edit.budget,
+      image: production_edit.image,
+      director:  production_edit.director,
+      description: production_edit.description,
+    },
+    validationSchema: formSchema,
+    onSubmit: (values) => {
+      // 10.✅ Add a PATCH
+    },
+  })
 
     return (
       <div className='App'>
-      {formik.errors&& Object.values(formik.errors).map(error => <h2>{error}</h2>)}
       <Form onSubmit={formik.handleSubmit}>
         <label>Title </label>
         <input type='text' name='title' value={formik.values.title} onChange={formik.handleChange}  />

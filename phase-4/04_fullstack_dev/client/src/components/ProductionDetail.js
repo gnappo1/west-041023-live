@@ -5,19 +5,26 @@ import styled from 'styled-components'
 function ProductionDetail({handleEdit, deleteProduction}) {
   const [production, setProduction] = useState({cast_members:[]})
   const [error, setError] = useState(null)
-  //Student Challenge: GET One 
   const params = useParams()
   const history = useHistory()
+  
+  //Student Challenge: GET One 
+  
   useEffect(()=>{
-
+    //! Retrieve the Production with the id from the params
+    //! If the production is not found, set an error message
+    //! If the production is found, set the production in state
   },[])
 
   const handleDelete = (production) => {
-
+    //! Delete the production from the database
+    //! If the production is not found, set an error message
+    //! If the production is found, send the use back to the list of productions
   }
 
   
   const {id, title, genre, image,description, cast_members} = production 
+  
   if(error) return <h2>{error}</h2>
   return (
       <CardDetail id={id}>
@@ -33,7 +40,7 @@ function ProductionDetail({handleEdit, deleteProduction}) {
                 {cast_members.map(cast => <li>{`${cast.role} : ${cast.name}`}</li>)}
               </ul>
             </div>
-            <img src={image}/>
+            <img src={image} alt={description}/>
           </div>
       <button onClick={()=> handleEdit(production)} >Edit Production</button>
       <button onClick={()=> handleDelete(production)} >Delete Production</button>
