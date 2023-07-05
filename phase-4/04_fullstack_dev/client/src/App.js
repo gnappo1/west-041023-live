@@ -21,25 +21,76 @@ function App() {
   const history = useHistory()
   //5.✅ GET Productions
 
+  // useEffect(() => {
+  //   (async () => {
+  //     const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me", {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}})]);
+  //     if (productions_resp.ok) {
+  //       const prods = await productions_resp.json()
+  //       setProductions(prods)
+  //     } else {
+  //       const error = await productions_resp.json()
+  //       setErrors(current => [...current, error.error])
+  //     }
+
+  //     if (auth_resp.ok) {
+  //       const user = await auth_resp.json()
+  //       setCurrentUser(user)
+  //     }
+  //   })();
+  // }, []);
+
   useEffect(() => {
-    (async () => {
-      const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me")]);
-      if (productions_resp.ok) {
-        const prods = await productions_resp.json()
-        setProductions(prods)
-      } else {
-        const error = await productions_resp.json()
-        setErrors(current => [...current, error.error])
-      }
+    const token = localStorage.getItem("token")
+    const refreshToken = localStorage.getItem("refreshToken")
+    if (token) {
+      (
+        async () => {
+          const resp = await fetch("/api/v1/me", {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          if (resp.ok) {
+            const user = await resp.json()
+            setCurrentUser(user)
+          } else if (resp.status === 401) {
+            // localStorage.removeItem("token")
+            (async () => {
+              debugger
+              const resp = await fetch("/api/v1/refresh_token", {
+                method: "POST",
+                headers: {
+                  'Authorization': `Bearer ${refreshToken}`
+                }
+              })
+              if (resp.ok) {
+                const data = await resp.json()
+                localStorage.setItem("token", data.token)
+                setCurrentUser(data.user)
+              } else {
+                setErrors(current => [...current, "Please log in again"])
+              }
+            })()
+          }
+        }
+      )()
+    }
+  }, [])
 
-      if (auth_resp.ok) {
-        const user = await auth_resp.json()
-        setCurrentUser(user)
+  useEffect(() => {
+    (
+      async () => {
+        const resp = await fetch("/api/v1/productions")
+        if (resp.ok) {
+          const data = await resp.json()
+          setProductions(data)
+        } else {
+          const error = await resp.json()
+          setErrors(current => [...current, error.error])
+        }
       }
-    })();
-  }, []);
-
-  
+    )()
+  }, [])
   // 6.✅ navigate to client/src/components/ProductionForm.js
 
   const addProduction = (production) => setProductions(productions => [...productions,production])

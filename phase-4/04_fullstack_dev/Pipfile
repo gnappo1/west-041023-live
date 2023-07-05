@@ -16,6 +16,7 @@ marshmallow-sqlalchemy = "*"
 flask-bcrypt = "*"
 flask-dotenv = "*"
 python-dotenv = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 ipdb = "*"

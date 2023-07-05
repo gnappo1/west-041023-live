@@ -58,7 +58,9 @@ const Registration = ({updateCurrentUser, addError}) => {
                 if (res.ok) {
                     res.json()
                     .then(data => {
-                        updateCurrentUser(data)
+                        localStorage.setItem('token', data.token)
+                        localStorage.setItem('refreshToken', data.refresh_token)
+                        updateCurrentUser(data.user)
                     })
                     .then(() => history.push("/"))
                 } else {

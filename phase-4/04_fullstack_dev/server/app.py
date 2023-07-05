@@ -25,6 +25,8 @@ from models.user import bcrypt, User
 from flask_dotenv import DotEnv
 from flask_bcrypt import Bcrypt
 import os
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, JWTManager
+from datetime import timedelta
 
 def create_app():
     from models.crew_member import CrewMember
@@ -48,7 +50,8 @@ def create_app():
     #* Show SQL Queries -> Look at them, how many times do you go into the db per request??
     # app.config["SQLALCHEMY_ECHO"] = True
     app.secret_key = os.environ.get("SECRET_KEY") #env.get("SECRET_KEY")
-    # print(app.secret_key)
+    # Setup the Flask-JWT-Extended extension
+    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
     #* Flask-Migrate wrapper
     migrate = Migrate(app, db)
     #* Flask-Marshmallow
@@ -137,6 +140,10 @@ db.init_app(app)
 ma.init_app(app)
 #* Flask-Bcrypt
 bcrypt.init_app(app)
+#* Flask-JWT-Extended
+jwt = JWTManager(app)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=5)
+
 #! Authentication starts here
 @app.route("/api/v1/signup", methods=["POST"])
 def signup():
@@ -146,8 +153,10 @@ def signup():
         user.password_hash = user_info.get("password", "")
         db.session.add(user)
         db.session.commit()
-        session["user_id"] = user.id
-        return make_response(user_schema.dump(user), 201)
+        # session["user_id"] = user.id
+        token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+        return make_response({'user': user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 201)
     except Exception as e:
         return make_response({"error": str(e)}, 400)
     
@@ -156,20 +165,35 @@ def signin():
     user_info = request.get_json()
     if user := User.query.filter_by(email=user_info.get("email", "")).first():
         if user.authenticate(user_info.get("password_hash", "")):
-            session["user_id"] = user.id
-            return make_response(user_schema.dump(user), 200)
+            # session["user_id"] = user.id
+            token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
+            return make_response({'user': user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 201)
     return make_response({"error": "Invalid credentials"}, 401)
 
+@app.route('/api/v1/refresh_token', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh_token():
+    id_ = get_jwt_identity()
+    user = db.session.get(User, id_)
+    # Generate a new access token
+    new_access_token = create_access_token(identity=id_)
+    refresh_token = create_refresh_token(identity=id_)
+    # return make_response({'user': user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 200)
+    return make_response({'token': new_access_token, "user": user_schema.dump(user)}, 200)
 
 @app.route("/api/v1/logout", methods=["DELETE"])
 def logout():
-    session.pop("user_id", None)
+    # session.pop("user_id", None)
+    
     return make_response({}, 204)
 
 @app.route("/api/v1/me", methods=["GET"])
+@jwt_required()
 def me():
-    if user_id := session.get("user_id", None):
-        if user := User.query.get(user_id):
+    if id_ :=get_jwt_identity():
+    # if user_id := session.get("user_id", None):
+        if user := db.session.get(User, id_):
             return make_response(user_schema.dump(user), 200)
     return make_response({"error": "Unauthorized"}, 401)
 
