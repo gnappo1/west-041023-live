@@ -39,3 +39,4 @@ with app.app_context():
     hamilton_crew_members = [CrewMember(name=fake.name(), role=role, production_id=p4.id) for role in hamilton_roles]
     db.session.add_all(hamilton_crew_members)
     db.session.commit()
+    print('done!')

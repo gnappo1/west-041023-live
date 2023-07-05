@@ -38,43 +38,86 @@ function App() {
   //     }
   //   })();
   // }, []);
+  const getCookie = (name) =>  {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift()
+    };
+  }
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token")
+  //   const refreshToken = localStorage.getItem("refreshToken")
+  //   if (token) {
+  //     (
+  //       async () => {
+  //         const resp = await fetch("/api/v1/me", {
+  //           headers: {
+  //             'Authorization': `Bearer ${token}`
+  //           }
+  //         })
+  //         if (resp.ok) {
+  //           const user = await resp.json()
+  //           setCurrentUser(user)
+  //         } else if (resp.status === 401) {
+  //           // localStorage.removeItem("token")
+  //           (async () => {
+  //             debugger
+  //             const resp = await fetch("/api/v1/refresh_token", {
+  //               method: "POST",
+  //               headers: {
+  //                 'Authorization': `Bearer ${refreshToken}`
+  //               }
+  //             })
+  //             if (resp.ok) {
+  //               const data = await resp.json()
+  //               localStorage.setItem("token", data.token)
+  //               setCurrentUser(data.user)
+  //             } else {
+  //               setErrors(current => [...current, "Please log in again"])
+  //             }
+  //           })()
+  //         }
+  //       }
+  //     )()
+  //   }
+  // }, [])
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    const refreshToken = localStorage.getItem("refreshToken")
-    if (token) {
-      (
-        async () => {
-          const resp = await fetch("/api/v1/me", {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          })
-          if (resp.ok) {
-            const user = await resp.json()
-            setCurrentUser(user)
-          } else if (resp.status === 401) {
-            // localStorage.removeItem("token")
-            (async () => {
-              debugger
+    (
+      async () => {
+        const options = {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: {
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+          },
+        };
+        const resp = await fetch("/api/v1/me", options)
+        if (resp.ok) {
+          const data = await resp.json()
+          updateCurrentUser(data)
+        } else {
+          (async () => {
               const resp = await fetch("/api/v1/refresh_token", {
                 method: "POST",
+                credentials: 'same-origin',
                 headers: {
-                  'Authorization': `Bearer ${refreshToken}`
-                }
+                    'X-CSRF-TOKEN': getCookie('csrf_refresh_token'),
+                },
               })
               if (resp.ok) {
                 const data = await resp.json()
-                localStorage.setItem("token", data.token)
+                // localStorage.setItem("token", data.token)
                 setCurrentUser(data.user)
               } else {
                 setErrors(current => [...current, "Please log in again"])
               }
-            })()
-          }
+          })()
         }
-      )()
-    }
+      }
+    )()
   }, [])
 
   useEffect(() => {
