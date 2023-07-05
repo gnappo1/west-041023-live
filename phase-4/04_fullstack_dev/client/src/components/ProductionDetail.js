@@ -2,7 +2,7 @@ import  {useParams, useHistory } from 'react-router-dom'
 import {useEffect, useState} from 'react'
 import styled from 'styled-components'
 
-function ProductionDetail({handleEdit, deleteProduction}) {
+function ProductionDetail({handleEdit, deleteProduction, currentUser}) {
   const [production, setProduction] = useState({crew_members:[]})
   const [error, setError] = useState(null)
   const {prodId} = useParams()
@@ -64,8 +64,12 @@ function ProductionDetail({handleEdit, deleteProduction}) {
             </div>
             <img src={image} alt={description}/>
           </div>
-      <button onClick={()=> handleEdit(production)} >Edit Production</button>
-      <button onClick={handleDelete} >Delete Production</button>
+      {currentUser ? (
+        <>
+          <button onClick={()=> handleEdit(production)} >Edit Production</button>
+          <button onClick={handleDelete} >Delete Production</button>
+        </>
+      ) : null}
 
       </CardDetail>
     )

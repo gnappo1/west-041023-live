@@ -13,6 +13,9 @@ importlib-resources = "*"
 flask-restful = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+flask-bcrypt = "*"
+flask-dotenv = "*"
+python-dotenv = "*"
 
 [dev-packages]
 ipdb = "*"

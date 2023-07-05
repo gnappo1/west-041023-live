@@ -11,18 +11,34 @@ import Navigation from './components/Navigation'
 import ProductionDetail from './components/ProductionDetail'
 import NotFound from './components/NotFound'
 import "./App.css"
+import Registration from './components/Registration'
 
 function App() {
   const [productions, setProductions] = useState([])
   const [production_edit, setProductionEdit] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [errors, setErrors] = useState([])
   const history = useHistory()
   //5.✅ GET Productions
+
   useEffect(() => {
-    fetch('/api/v1/productions')
-    .then(res => res.json())
-    .then(data => setProductions(data))
-    .catch(err => console.log(err))
-  }, [])
+    (async () => {
+      const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me")]);
+      if (productions_resp.ok) {
+        const prods = await productions_resp.json()
+        setProductions(prods)
+      } else {
+        const error = await productions_resp.json()
+        setErrors(current => [...current, error.error])
+      }
+
+      if (auth_resp.ok) {
+        const user = await auth_resp.json()
+        setCurrentUser(user)
+      }
+    })();
+  }, []);
+
   
   // 6.✅ navigate to client/src/components/ProductionForm.js
 
@@ -43,10 +59,37 @@ function App() {
       state: production
     })
   }
+
+  const updateCurrentUser = (user) => { setCurrentUser(user) }
+  const addError = (error) => { setErrors(current => [...current, error]) }
+
+  if (!currentUser) {
+    return (
+      <>
+        <GlobalStyle />
+        <Navigation handleEdit={handleEdit} currentUser={currentUser}/>
+        <Switch>
+          <Route path='/auth'>
+              <Registration updateCurrentUser={updateCurrentUser} addError={addError} />
+          </Route>
+          <Route path='/productions/:prodId'>
+            <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} currentUser={currentUser} />
+          </Route>
+          <Route exact path='/'>
+            <Home  productions={productions} />
+          </Route>
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </>
+  )
+}
+
   return (
     <>
     <GlobalStyle />
-    <Navigation handleEdit={handleEdit}/>
+    <Navigation handleEdit={handleEdit} updateCurrentUser={updateCurrentUser} currentUser={currentUser}/>
     <Switch>
       <Route  path='/productions/new'>
         <ProductionForm addProduction={addProduction}/>
@@ -55,7 +98,7 @@ function App() {
         <ProductionEdit updateProduction={updateProduction} production_edit={production_edit}/>
       </Route>
       <Route path='/productions/:prodId'>
-          <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} />
+          <ProductionDetail handleEdit={handleEdit} deleteProduction={deleteProduction} currentUser={currentUser} />
       </Route>
       <Route exact path='/'>
         <Home  productions={productions} />

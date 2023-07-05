@@ -1,7 +1,7 @@
 from models.crew_member import CrewMember
 from models import db
 
-from blueprints import request, Blueprint, make_response, abort, ValidationError, Resource
+from blueprints import request, Blueprint, make_response, abort, ValidationError, Resource, login_required
 from blueprints.crew_member_by_id import crew_member_schema, CrewMemberSchema
 
 crew_members_schema = CrewMemberSchema(many=True, exclude=("production",))
@@ -12,6 +12,7 @@ class CrewMembers(Resource):
         crew = crew_members_schema.dump(CrewMember.query.all())
         return make_response(crew, 200)
     
+    @login_required
     def post(self):
         try:
             data = request.json

@@ -3,9 +3,12 @@ import {Link} from 'react-router-dom'
 import styled from 'styled-components'
 import { GiHamburgerMenu } from 'react-icons/gi'
 
-function Navigation({handleEdit}) {
+function Navigation({handleEdit, currentUser, updateCurrentUser, addError}) {
   const [menu, setMenu] = useState(false)
-  
+  const handleLogout = (e) => {
+    fetch("/api/v1/logout", {method: "DELETE"})
+    .then((res) => res.ok ? updateCurrentUser(null) : addError("Something went wrong!"))
+  }
   return (
     <Nav> 
       <NavH1>Flatiron Theater Company</NavH1>
@@ -16,8 +19,15 @@ function Navigation({handleEdit}) {
         </div>:
         <ul>
           <li onClick={() => setMenu(!menu)}>x</li>
-          <li ><Link to='/productions/new'>New Production</Link></li>
           <li><Link to='/'> Home</Link></li>
+          {currentUser ? (
+            <>
+              <li ><Link to='/productions/new'>New Production</Link></li>
+              <li onClick={handleLogout}><Link to='/'>Logout</Link></li>
+            </>
+          ) : (
+            <li><Link to='/auth'>Register</Link></li>
+          )}
         </ul>
         }
       </Menu>

@@ -1,7 +1,7 @@
 from models.production import Production
 from models import db
 
-from blueprints import abort, make_response, request, Resource, Blueprint, ValidationError
+from blueprints import abort, make_response, request, Resource, Blueprint, ValidationError, login_required
 from blueprints.production_by_id import production_schema, ProductionSchema
 
 productions_schema = ProductionSchema(many=True, exclude=("crew_members",))
@@ -12,6 +12,7 @@ class Productions(Resource):
         prods = productions_schema.dump(Production.query.all())
         return make_response(prods, 200)
 
+    @login_required
     def post(self):
         try:
             #* Extract data out of the request
