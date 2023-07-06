@@ -160,6 +160,11 @@ def signup():
         token = create_access_token(identity=user.id)
         refresh_token = create_refresh_token(identity=user.id)
         response = make_response({'user': user_schema.dump(user)}, 201)
+        #! When the response is visible in the devTools, take a look in 2 places:
+        #! Headers: you will see the Set-Cookie: headers
+        #! Application > Cookies
+        #! your http-only cookies (jwt and refresh tokens)
+        #! and the CSRF tokens accessible by JS are there
         set_access_cookies(response, token)
         set_refresh_cookies(response, refresh_token)
         return response
@@ -187,15 +192,12 @@ def refresh_token():
     user = db.session.get(User, id_)
     # Generate a new access token
     new_access_token = create_access_token(identity=id_)
-    # refresh_token = create_refresh_token(identity=id_)
-    # return make_response({'user': user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 200)
     response = make_response({"user": user_schema.dump(user)}, 200)
     set_access_cookies(response, new_access_token)
     return response
 
 @app.route("/api/v1/logout", methods=["DELETE"])
 def logout():
-    # session.pop("user_id", None)
     response = make_response({}, 204)
     unset_jwt_cookies(response)
     return response
@@ -204,7 +206,6 @@ def logout():
 @jwt_required()
 def me():
     if id_ := get_jwt_identity():
-    # if user_id := session.get("user_id", None):
         if user := db.session.get(User, id_):
             return make_response(user_schema.dump(user), 200)
     return make_response({"error": "Unauthorized"}, 401)
