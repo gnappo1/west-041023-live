@@ -25,8 +25,10 @@ from models.user import bcrypt, User
 from flask_dotenv import DotEnv
 from flask_bcrypt import Bcrypt
 import os
+
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, JWTManager
 from datetime import timedelta
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
+
 def create_app():
     from models.crew_member import CrewMember
     from models.production import Production
@@ -48,10 +50,9 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     #* Show SQL Queries -> Look at them, how many times do you go into the db per request??
     # app.config["SQLALCHEMY_ECHO"] = True
-    app.secret_key = os.environ.get("SECRET_KEY")
+    app.secret_key = os.environ.get("SECRET_KEY") #env.get("SECRET_KEY")
+    # Setup the Flask-JWT-Extended extension
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
-    
-    # print(app.secret_key)
     #* Flask-Migrate wrapper
     migrate = Migrate(app, db)
     #* Flask-Marshmallow
@@ -142,7 +143,7 @@ ma.init_app(app)
 bcrypt.init_app(app)
 #* Flask-JWT-Extended
 jwt = JWTManager(app)
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=2)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=5)
 #! Authentication starts here
 
 @app.route("/api/v1/signup", methods=["POST"])
@@ -155,7 +156,7 @@ def signup():
         db.session.commit()
         # session["user_id"] = user.id
         token = create_access_token(identity=user.id)
-        refresh_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
         return make_response({"user": user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 201)
     except Exception as e:
         return make_response({"error": str(e)}, 400)
@@ -167,35 +168,36 @@ def signin():
         if user.authenticate(user_info.get("password_hash", "")):
             # session["user_id"] = user.id
             token = create_access_token(identity=user.id)
-            refresh_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
             return make_response({"user": user_schema.dump(user), 'token': token, 'refresh_token': refresh_token}, 200)
     return make_response({"error": "Invalid credentials"}, 401)
 
-
 @app.route("/api/v1/logout", methods=["DELETE"])
 def logout():
-    # session.pop("user_id", None)
     return make_response({}, 204)
 
 @app.route("/api/v1/me", methods=["GET"])
 @jwt_required()
 def me():
-    # if id_ := get_jwt_identity(): #session.get("user_id", None):
-    if user := User.query.get(get_jwt_identity()):
-        return make_response(user_schema.dump(user), 200)
+    if id_ :=get_jwt_identity():
+    # if user_id := session.get("user_id", None):
+        if user := db.session.get(User, id_):
+            return make_response(user_schema.dump(user), 200)
     return make_response({"error": "Unauthorized"}, 401)
 
-@app.route("/api/v1/refresh_token", methods=["POST"])
+@app.route('/api/v1/refresh_token', methods=['POST'])
 @jwt_required(refresh=True)
+# We are using the `refresh=True` options in jwt_required to only allow
+# refresh tokens to access this route.
 def refresh_token():
     id_ = get_jwt_identity()
-    try:
-        user = User.query.get(id_)
-    
-        token = create_access_token(identity=user.id)
-        # refresh_token = create_access_token(identity=user.id)
-        return make_response({"user": user_schema.dump(user), 'token': token}, 200)
-    except Exception as e:
-        return make_response({"error": "User not found"}, 404)
+    if user := db.session.get(User, id_):
+        # Generate a new access token
+        new_access_token = create_access_token(identity=id_)
+        # refresh_token = create_refresh_token(identity=id_)
+        # return make_response({'user': user_schema.dump(user), 'token': new_access_token, 'refresh_token': refresh_token}, 200)
+        return make_response({'token': new_access_token, "user": user_schema.dump(user)}, 200)
+    return make_response({'error': 'User not found'}, 404)
+
 if __name__ == "__main__":
     app.run(debug=True, port=5555)

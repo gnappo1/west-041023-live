@@ -12,6 +12,7 @@ import ProductionDetail from './components/ProductionDetail'
 import NotFound from './components/NotFound'
 import "./App.css"
 import Registration from './components/Registration'
+import Notification from './components/Notification'
 
 function App() {
   const [productions, setProductions] = useState([])
@@ -19,51 +20,79 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [errors, setErrors] = useState([])
   const history = useHistory()
-  //5.✅ GET Productions
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me", {headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}})]);
+  //     if (productions_resp.ok) {
+  //       const prods = await productions_resp.json()
+  //       setProductions(prods)
+  //     } else {
+  //       const error = await productions_resp.json()
+  //       setErrors(current => [...current, error.error])
+  //     }
+
+  //     if (auth_resp.ok) {
+  //       const user = await auth_resp.json()
+  //       setCurrentUser(user)
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
-    (async () => {
-      const configObj = {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+    const token = localStorage.getItem("token")
+    const refreshToken = localStorage.getItem("refreshToken")
+    if (token) {
+      (
+        async () => {
+          const resp = await fetch("/api/v1/me", {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          if (resp.ok) {
+            const user = await resp.json()
+            setCurrentUser(user)
+          } else if (resp.status === 401) {
+            // localStorage.removeItem("token")
+            (async () => {
+              debugger
+              const resp = await fetch("/api/v1/refresh_token", {
+                method: "POST",
+                headers: {
+                  'Authorization': `Bearer ${refreshToken}`
+                }
+              })
+              if (resp.ok) {
+                const data = await resp.json()
+                localStorage.setItem("token", data.token)
+                // localStorage.setItem("refreshToken", data.refresh_token)
+                setCurrentUser(data.user)
+              } else {
+                addError("Please log in again")
+              }
+            })()
+          }
+        }
+      )()
+    }
+  }, [])
+
+  //5.✅ GET Productions
+  useEffect(() => {
+    (
+      async () => {
+        const resp = await fetch("/api/v1/productions")
+        if (resp.ok) {
+          const data = await resp.json()
+          setProductions(data)
+        } else {
+          const error = await resp.json()
+          setErrors(current => [...current, error.error])
         }
       }
-      const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me", configObj)]);
-      if (productions_resp.ok) {
-        const prods = await productions_resp.json()
-        setProductions(prods)
-      } else {
-        const error = await productions_resp.json()
-        setErrors(current => [...current, error.error])
-      }
-
-      if (auth_resp.ok) {
-        const user = await auth_resp.json()
-        setCurrentUser(user)
-      } else {
-        (
-          async () => {
-            const resp = await fetch("/api/v1/refresh_token", {
-              method: "POST",
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('refresh_token')}`
-              }
-            })
-            if (resp.ok) {
-              const data = await resp.json()
-              localStorage.setItem("token", data.token)
-              setCurrentUser(data.user)
-            } else {
-              setErrors(current => [...current, "Please log in again!"])
-            }
-          }
-        )()
-      }
-    })();
-  }, []);
-
-  
-  // 6.✅ navigate to client/src/components/ProductionForm.js
+    )()
+  }, [])
 
   const addProduction = (production) => setProductions(productions => [...productions,production])
   const updateProduction = (updated_production) => setProductions(productions => productions.map(production =>{
@@ -85,11 +114,12 @@ function App() {
 
   const updateCurrentUser = (user) => { setCurrentUser(user) }
   const addError = (error) => { setErrors(current => [...current, error]) }
-
+  const resetErrors = () => { setErrors([]) }
   if (!currentUser) {
     return (
       <>
         <GlobalStyle />
+        <Notification errors={errors} resetErrors={resetErrors} />
         <Navigation handleEdit={handleEdit} currentUser={currentUser}/>
         <Switch>
           <Route path='/auth'>
@@ -112,6 +142,7 @@ function App() {
   return (
     <>
     <GlobalStyle />
+    <Notification errors={errors} resetErrors={resetErrors} />
     <Navigation handleEdit={handleEdit} updateCurrentUser={updateCurrentUser} currentUser={currentUser}/>
     <Switch>
       <Route  path='/productions/new'>

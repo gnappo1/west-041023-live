@@ -10,7 +10,7 @@ function Navigation({handleEdit, currentUser, updateCurrentUser, addError}) {
     .then((res) => {
       if (res.ok) {
         localStorage.removeItem("token")
-        localStorage.removeItem("refresh_token")
+        localStorage.removeItem("refreshToken")
         updateCurrentUser(null)
       } else {
         addError("Something went wrong!")

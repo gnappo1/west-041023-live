@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 function ProductionCard({production}) {
     const {title, budget, genre, image, id} = production
-    console.log(production)
+
     return (
       <Card id={id}>
         <Link to={`/productions/${id}`}> 
