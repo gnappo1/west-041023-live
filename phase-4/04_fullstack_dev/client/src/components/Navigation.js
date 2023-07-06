@@ -7,7 +7,15 @@ function Navigation({handleEdit, currentUser, updateCurrentUser, addError}) {
   const [menu, setMenu] = useState(false)
   const handleLogout = (e) => {
     fetch("/api/v1/logout", {method: "DELETE"})
-    .then((res) => res.ok ? updateCurrentUser(null) : addError("Something went wrong!"))
+    .then((res) => {
+      if (res.ok) {
+        localStorage.removeItem("token")
+        localStorage.removeItem("refresh_token")
+        updateCurrentUser(null)
+      } else {
+        addError("Something went wrong!")
+      }
+    })
   }
   return (
     <Nav> 

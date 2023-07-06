@@ -23,7 +23,12 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me")]);
+      const configObj = {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+      const [productions_resp, auth_resp] = await Promise.all([fetch("/api/v1/productions"), fetch("/api/v1/me", configObj)]);
       if (productions_resp.ok) {
         const prods = await productions_resp.json()
         setProductions(prods)
@@ -35,6 +40,24 @@ function App() {
       if (auth_resp.ok) {
         const user = await auth_resp.json()
         setCurrentUser(user)
+      } else {
+        (
+          async () => {
+            const resp = await fetch("/api/v1/refresh_token", {
+              method: "POST",
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('refresh_token')}`
+              }
+            })
+            if (resp.ok) {
+              const data = await resp.json()
+              localStorage.setItem("token", data.token)
+              setCurrentUser(data.user)
+            } else {
+              setErrors(current => [...current, "Please log in again!"])
+            }
+          }
+        )()
       }
     })();
   }, []);

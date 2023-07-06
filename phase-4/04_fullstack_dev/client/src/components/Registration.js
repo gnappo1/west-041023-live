@@ -58,7 +58,10 @@ const Registration = ({updateCurrentUser, addError}) => {
                 if (res.ok) {
                     res.json()
                     .then(data => {
-                        updateCurrentUser(data)
+                        //! Make sure that the tokens sent across are stored in localStorage
+                        localStorage.setItem("token", data.token)
+                        localStorage.setItem("refresh_token", data.refresh_token)
+                        updateCurrentUser(data.user)
                     })
                     .then(() => history.push("/"))
                 } else {
